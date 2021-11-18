@@ -46,3 +46,6 @@ git am nezha-patch-v5.15/0005-clk-sunxi-ng-mux-Allow-muxes-to-have-keys.patch
 git am nezha-patch-v5.15/0006-rtc-sun6i-Allow-probing-without-an-early-clock-provi.patch
 git am nezha-patch-v5.15/0007-clk-sunxi-ng-Add-support-for-the-sun6i-RTC-clocks.patch
 git am nezha-patch-v5.15/0008-clk-sunxi-ng-sun6i-rtc-Add-support-for-H6.patch
+
+# todo:
+git am nezha-patch-v5.15/0001-soc-very-early-initialization-of-SUNXI-RISC-V-SOC.patch

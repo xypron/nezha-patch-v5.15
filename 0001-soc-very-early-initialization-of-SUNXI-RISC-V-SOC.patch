@@ -1,0 +1,40 @@
+From 2cb70ac46689f42673ba4d7f6b32520a28a5d6fa Mon Sep 17 00:00:00 2001
+From: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+Date: Thu, 18 Nov 2021 18:58:18 +0100
+Subject: [PATCH] soc: very early initialization of SUNXI RISC-V SOC
+
+Signed-off-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+---
+ drivers/soc/sunxi/Makefile           |  1 +
+ drivers/soc/sunxi/soc_sunxi_sysctl.c | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
+ create mode 100644 drivers/soc/sunxi/soc_sunxi_sysctl.c
+
+diff --git a/drivers/soc/sunxi/Makefile b/drivers/soc/sunxi/Makefile
+index 549159571d4f..0e9bb9071fad 100644
+--- a/drivers/soc/sunxi/Makefile
++++ b/drivers/soc/sunxi/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ obj-$(CONFIG_SUNXI_MBUS) +=	sunxi_mbus.o
+ obj-$(CONFIG_SUNXI_SRAM) +=	sunxi_sram.o
++obj-$(CONFIG_SOC_SUNXI) +=	soc_sunxi_sysctl.o
+diff --git a/drivers/soc/sunxi/soc_sunxi_sysctl.c b/drivers/soc/sunxi/soc_sunxi_sysctl.c
+new file mode 100644
+index 000000000000..89cc803ac94a
+--- /dev/null
++++ b/drivers/soc/sunxi/soc_sunxi_sysctl.c
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++#include <asm/soc.h>
++
++static void __init sun20i_d1_soc_early_init(const void *fdt)
++{
++}
++
++SOC_EARLY_INIT_DECLARE(sun20i_d1_soc, "allwinner,sun20i-d1",
++		       sun20i_d1_soc_early_init);
+-- 
+2.32.0
+
