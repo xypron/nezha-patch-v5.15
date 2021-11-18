@@ -1,0 +1,67 @@
+From 4a5e6720589ac09e1852a284df2633257823aee3 Mon Sep 17 00:00:00 2001
+From: Liu Shaohua <liush@allwinnertech.com>
+Date: Sat, 11 Sep 2021 17:21:39 +0800
+Subject: [PATCH 6/6] riscv: soc: Add Allwinner SoC kconfig option
+
+Add Allwinner kconfig option which selects SoC specific and common
+drivers that is required for this SoC.
+
+Allwinner D1 uses custom PTE attributes to solve non-coherency SOC
+interconnect issues for dma synchronization, so we set the default
+value when SOC_SUNXI selected.
+
+Signed-off-by: Liu Shaohua <liush@allwinnertech.com>
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Signed-off-by: Wei Fu <wefu@redhat.com>
+Cc: Anup Patel <anup.patel@wdc.com>
+Cc: Atish Patra <atish.patra@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Chen-Yu Tsai <wens@csie.org>
+Cc: Drew Fustini <drew@beagleboard.org>
+Cc: Maxime Ripard <maxime@cerno.tech>
+Cc: Palmer Dabbelt <palmerdabbelt@google.com>
+Cc: Wei Wu <lazyparser@gmail.com>
+---
+ arch/riscv/Kconfig.socs      | 15 +++++++++++++++
+ arch/riscv/configs/defconfig |  1 +
+ 2 files changed, 16 insertions(+)
+
+diff --git a/arch/riscv/Kconfig.socs b/arch/riscv/Kconfig.socs
+index 56bafc3dad4c..b59a9caff974 100644
+--- a/arch/riscv/Kconfig.socs
++++ b/arch/riscv/Kconfig.socs
+@@ -73,4 +73,19 @@ config SOC_CANAAN_K210_DTB_SOURCE
+ 
+ endif
+ 
++config SOC_SUNXI
++	bool "Allwinner SoCs"
++	depends on MMU
++	select DWMAC_GENERIC
++	select ERRATA_THEAD
++	select RISCV_DMA_NONCOHERENT
++	select RISCV_ERRATA_ALTERNATIVE
++	select SERIAL_8250
++	select SERIAL_8250_CONSOLE
++	select SERIAL_8250_DW
++	select SIFIVE_PLIC
++	select STMMAC_ETH
++	help
++	  This enables support for Allwinner SoC platforms like the D1.
++
+ endmenu
+diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
+index 5ae71fa92c28..1d038fab52f8 100644
+--- a/arch/riscv/configs/defconfig
++++ b/arch/riscv/configs/defconfig
+@@ -17,6 +17,7 @@ CONFIG_EXPERT=y
+ # CONFIG_SYSFS_SYSCALL is not set
+ CONFIG_SOC_MICROCHIP_POLARFIRE=y
+ CONFIG_SOC_SIFIVE=y
++CONFIG_SOC_SUNXI=y
+ CONFIG_SOC_VIRT=y
+ CONFIG_SMP=y
+ CONFIG_HOTPLUG_CPU=y
+-- 
+2.32.0
+

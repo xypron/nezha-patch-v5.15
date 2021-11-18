@@ -1,0 +1,72 @@
+From a580cbab61306ecabb9488fa049025cdc58165cc Mon Sep 17 00:00:00 2001
+From: Anup Patel <anup.patel@wdc.com>
+Date: Tue, 12 Oct 2021 15:28:53 +0530
+Subject: [PATCH 4/8] RISC-V: Add SBI HSM suspend related defines
+
+We add defines related to SBI HSM suspend call and also
+update HSM states naming as-per latest SBI specification.
+
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
+ arch/riscv/include/asm/sbi.h    | 27 ++++++++++++++++++++++-----
+ arch/riscv/kernel/cpu_ops_sbi.c |  2 +-
+ 2 files changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+index 289621da4a2a..ab9782f8da52 100644
+--- a/arch/riscv/include/asm/sbi.h
++++ b/arch/riscv/include/asm/sbi.h
+@@ -62,15 +62,32 @@ enum sbi_ext_hsm_fid {
+ 	SBI_EXT_HSM_HART_START = 0,
+ 	SBI_EXT_HSM_HART_STOP,
+ 	SBI_EXT_HSM_HART_STATUS,
++	SBI_EXT_HSM_HART_SUSPEND,
+ };
+ 
+-enum sbi_hsm_hart_status {
+-	SBI_HSM_HART_STATUS_STARTED = 0,
+-	SBI_HSM_HART_STATUS_STOPPED,
+-	SBI_HSM_HART_STATUS_START_PENDING,
+-	SBI_HSM_HART_STATUS_STOP_PENDING,
++enum sbi_hsm_hart_state {
++	SBI_HSM_STATE_STARTED = 0,
++	SBI_HSM_STATE_STOPPED,
++	SBI_HSM_STATE_START_PENDING,
++	SBI_HSM_STATE_STOP_PENDING,
++	SBI_HSM_STATE_SUSPENDED,
++	SBI_HSM_STATE_SUSPEND_PENDING,
++	SBI_HSM_STATE_RESUME_PENDING,
+ };
+ 
++#define SBI_HSM_SUSP_BASE_MASK			0x7fffffff
++#define SBI_HSM_SUSP_NON_RET_BIT		0x80000000
++#define SBI_HSM_SUSP_PLAT_BASE			0x10000000
++
++#define SBI_HSM_SUSPEND_RET_DEFAULT		0x00000000
++#define SBI_HSM_SUSPEND_RET_PLATFORM		SBI_HSM_SUSP_PLAT_BASE
++#define SBI_HSM_SUSPEND_RET_LAST		SBI_HSM_SUSP_BASE_MASK
++#define SBI_HSM_SUSPEND_NON_RET_DEFAULT		SBI_HSM_SUSP_NON_RET_BIT
++#define SBI_HSM_SUSPEND_NON_RET_PLATFORM	(SBI_HSM_SUSP_NON_RET_BIT | \
++						 SBI_HSM_SUSP_PLAT_BASE)
++#define SBI_HSM_SUSPEND_NON_RET_LAST		(SBI_HSM_SUSP_NON_RET_BIT | \
++						 SBI_HSM_SUSP_BASE_MASK)
++
+ enum sbi_ext_srst_fid {
+ 	SBI_EXT_SRST_RESET = 0,
+ };
+diff --git a/arch/riscv/kernel/cpu_ops_sbi.c b/arch/riscv/kernel/cpu_ops_sbi.c
+index 685fae72b7f5..5fd90f03a3e9 100644
+--- a/arch/riscv/kernel/cpu_ops_sbi.c
++++ b/arch/riscv/kernel/cpu_ops_sbi.c
+@@ -97,7 +97,7 @@ static int sbi_cpu_is_stopped(unsigned int cpuid)
+ 
+ 	rc = sbi_hsm_hart_get_status(hartid);
+ 
+-	if (rc == SBI_HSM_HART_STATUS_STOPPED)
++	if (rc == SBI_HSM_STATE_STOPPED)
+ 		return 0;
+ 	return rc;
+ }
+-- 
+2.32.0
+

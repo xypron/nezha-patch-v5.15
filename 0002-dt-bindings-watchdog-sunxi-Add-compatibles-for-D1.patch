@@ -1,0 +1,45 @@
+From 4a85101c99c010d0a6dd7d3f3c803882f5a41f24 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Thu, 2 Sep 2021 17:57:49 -0500
+Subject: [PATCH 2/3] dt-bindings: watchdog: sunxi: Add compatibles for D1
+
+D1 keeps the same register layout and clock sources as the R329, but it
+adds a key field which must be set to update the watchdog's "CFG" and
+"MODE" registers. Therefore it is not backward-compatible.
+
+Similarly to the R329, the D1 has three watchdog instances, and only one
+of them has the "soft reset" registers. So that instance needs an extra
+compatible string.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ .../bindings/watchdog/allwinner,sun4i-a10-wdt.yaml          | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/watchdog/allwinner,sun4i-a10-wdt.yaml b/Documentation/devicetree/bindings/watchdog/allwinner,sun4i-a10-wdt.yaml
+index 877f47759814..44cad9427ae6 100644
+--- a/Documentation/devicetree/bindings/watchdog/allwinner,sun4i-a10-wdt.yaml
++++ b/Documentation/devicetree/bindings/watchdog/allwinner,sun4i-a10-wdt.yaml
+@@ -30,6 +30,10 @@ properties:
+       - items:
+           - const: allwinner,suniv-f1c100s-wdt
+           - const: allwinner,sun4i-a10-wdt
++      - const: allwinner,sun20i-d1-wdt
++      - items:
++          - const: allwinner,sun20i-d1-wdt-reset
++          - const: allwinner,sun20i-d1-wdt
+ 
+   reg:
+     maxItems: 1
+@@ -62,6 +66,8 @@ if:
+     compatible:
+       contains:
+         enum:
++          - allwinner,sun20i-d1-wdt
++          - allwinner,sun20i-d1-wdt-reset
+           - allwinner,sun50i-r329-wdt
+           - allwinner,sun50i-r329-wdt-reset
+ 
+-- 
+2.32.0
+

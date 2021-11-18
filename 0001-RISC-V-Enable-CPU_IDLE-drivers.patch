@@ -1,0 +1,200 @@
+From d7d51651bc94ba6d28a39db6c30a7acee46ac423 Mon Sep 17 00:00:00 2001
+From: Anup Patel <anup.patel@wdc.com>
+Date: Tue, 12 Oct 2021 15:28:50 +0530
+Subject: [PATCH 1/8] RISC-V: Enable CPU_IDLE drivers
+
+We force select CPU_PM and provide asm/cpuidle.h so that we can
+use CPU IDLE drivers for Linux RISC-V kernel.
+
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
+ arch/riscv/Kconfig                |  7 +++++++
+ arch/riscv/configs/defconfig      | 14 ++++++--------
+ arch/riscv/configs/rv32_defconfig |  7 +++----
+ arch/riscv/include/asm/cpuidle.h  | 24 ++++++++++++++++++++++++
+ arch/riscv/kernel/process.c       |  3 ++-
+ 5 files changed, 42 insertions(+), 13 deletions(-)
+ create mode 100644 arch/riscv/include/asm/cpuidle.h
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index f076cee11af6..c2cbab37f358 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -45,6 +45,7 @@ config RISCV
+ 	select CLONE_BACKWARDS
+ 	select CLINT_TIMER if !MMU
+ 	select COMMON_CLK
++	select CPU_PM if CPU_IDLE
+ 	select EDAC_SUPPORT
+ 	select GENERIC_ARCH_TOPOLOGY if SMP
+ 	select GENERIC_ATOMIC64 if !64BIT
+@@ -567,3 +568,9 @@ menu "Power management options"
+ source "kernel/power/Kconfig"
+ 
+ endmenu
++
++menu "CPU Power Management"
++
++source "drivers/cpuidle/Kconfig"
++
++endmenu
+diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
+index 4ebc80315f01..9851ba671e90 100644
+--- a/arch/riscv/configs/defconfig
++++ b/arch/riscv/configs/defconfig
+@@ -2,6 +2,7 @@ CONFIG_SYSVIPC=y
+ CONFIG_POSIX_MQUEUE=y
+ CONFIG_NO_HZ_IDLE=y
+ CONFIG_HIGH_RES_TIMERS=y
++CONFIG_BPF_SYSCALL=y
+ CONFIG_IKCONFIG=y
+ CONFIG_IKCONFIG_PROC=y
+ CONFIG_CGROUPS=y
+@@ -13,12 +14,13 @@ CONFIG_USER_NS=y
+ CONFIG_CHECKPOINT_RESTORE=y
+ CONFIG_BLK_DEV_INITRD=y
+ CONFIG_EXPERT=y
+-CONFIG_BPF_SYSCALL=y
++# CONFIG_SYSFS_SYSCALL is not set
++CONFIG_SOC_MICROCHIP_POLARFIRE=y
+ CONFIG_SOC_SIFIVE=y
+ CONFIG_SOC_VIRT=y
+-CONFIG_SOC_MICROCHIP_POLARFIRE=y
+ CONFIG_SMP=y
+ CONFIG_HOTPLUG_CPU=y
++CONFIG_CPU_IDLE=y
+ CONFIG_JUMP_LABEL=y
+ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+@@ -68,14 +70,12 @@ CONFIG_HW_RANDOM=y
+ CONFIG_HW_RANDOM_VIRTIO=y
+ CONFIG_SPI=y
+ CONFIG_SPI_SIFIVE=y
++# CONFIG_PTP_1588_CLOCK is not set
+ CONFIG_GPIOLIB=y
+ CONFIG_GPIO_SIFIVE=y
+-# CONFIG_PTP_1588_CLOCK is not set
+-CONFIG_POWER_RESET=y
+ CONFIG_DRM=y
+ CONFIG_DRM_RADEON=y
+ CONFIG_DRM_VIRTIO_GPU=y
+-CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_USB=y
+ CONFIG_USB_XHCI_HCD=y
+ CONFIG_USB_XHCI_PLATFORM=y
+@@ -85,10 +85,10 @@ CONFIG_USB_OHCI_HCD=y
+ CONFIG_USB_OHCI_HCD_PLATFORM=y
+ CONFIG_USB_STORAGE=y
+ CONFIG_USB_UAS=y
++CONFIG_MMC=y
+ CONFIG_MMC_SDHCI=y
+ CONFIG_MMC_SDHCI_PLTFM=y
+ CONFIG_MMC_SDHCI_CADENCE=y
+-CONFIG_MMC=y
+ CONFIG_MMC_SPI=y
+ CONFIG_RTC_CLASS=y
+ CONFIG_VIRTIO_PCI=y
+@@ -139,5 +139,3 @@ CONFIG_RCU_EQS_DEBUG=y
+ # CONFIG_FTRACE is not set
+ # CONFIG_RUNTIME_TESTING_MENU is not set
+ CONFIG_MEMTEST=y
+-# CONFIG_SYSFS_SYSCALL is not set
+-CONFIG_EFI=y
+diff --git a/arch/riscv/configs/rv32_defconfig b/arch/riscv/configs/rv32_defconfig
+index 434ef5b64599..725ca3332900 100644
+--- a/arch/riscv/configs/rv32_defconfig
++++ b/arch/riscv/configs/rv32_defconfig
+@@ -2,6 +2,7 @@ CONFIG_SYSVIPC=y
+ CONFIG_POSIX_MQUEUE=y
+ CONFIG_NO_HZ_IDLE=y
+ CONFIG_HIGH_RES_TIMERS=y
++CONFIG_BPF_SYSCALL=y
+ CONFIG_IKCONFIG=y
+ CONFIG_IKCONFIG_PROC=y
+ CONFIG_CGROUPS=y
+@@ -13,12 +14,13 @@ CONFIG_USER_NS=y
+ CONFIG_CHECKPOINT_RESTORE=y
+ CONFIG_BLK_DEV_INITRD=y
+ CONFIG_EXPERT=y
+-CONFIG_BPF_SYSCALL=y
++# CONFIG_SYSFS_SYSCALL is not set
+ CONFIG_SOC_SIFIVE=y
+ CONFIG_SOC_VIRT=y
+ CONFIG_ARCH_RV32I=y
+ CONFIG_SMP=y
+ CONFIG_HOTPLUG_CPU=y
++CONFIG_CPU_IDLE=y
+ CONFIG_JUMP_LABEL=y
+ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+@@ -67,11 +69,9 @@ CONFIG_HW_RANDOM_VIRTIO=y
+ CONFIG_SPI=y
+ CONFIG_SPI_SIFIVE=y
+ # CONFIG_PTP_1588_CLOCK is not set
+-CONFIG_POWER_RESET=y
+ CONFIG_DRM=y
+ CONFIG_DRM_RADEON=y
+ CONFIG_DRM_VIRTIO_GPU=y
+-CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_USB=y
+ CONFIG_USB_XHCI_HCD=y
+ CONFIG_USB_XHCI_PLATFORM=y
+@@ -130,4 +130,3 @@ CONFIG_RCU_EQS_DEBUG=y
+ # CONFIG_FTRACE is not set
+ # CONFIG_RUNTIME_TESTING_MENU is not set
+ CONFIG_MEMTEST=y
+-# CONFIG_SYSFS_SYSCALL is not set
+diff --git a/arch/riscv/include/asm/cpuidle.h b/arch/riscv/include/asm/cpuidle.h
+new file mode 100644
+index 000000000000..71fdc607d4bc
+--- /dev/null
++++ b/arch/riscv/include/asm/cpuidle.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2021 Allwinner Ltd
++ * Copyright (C) 2021 Western Digital Corporation or its affiliates.
++ */
++
++#ifndef _ASM_RISCV_CPUIDLE_H
++#define _ASM_RISCV_CPUIDLE_H
++
++#include <asm/barrier.h>
++#include <asm/processor.h>
++
++static inline void cpu_do_idle(void)
++{
++	/*
++	 * Add mb() here to ensure that all
++	 * IO/MEM accesses are completed prior
++	 * to entering WFI.
++	 */
++	mb();
++	wait_for_interrupt();
++}
++
++#endif
+diff --git a/arch/riscv/kernel/process.c b/arch/riscv/kernel/process.c
+index 03ac3aa611f5..504b496787aa 100644
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -23,6 +23,7 @@
+ #include <asm/string.h>
+ #include <asm/switch_to.h>
+ #include <asm/thread_info.h>
++#include <asm/cpuidle.h>
+ 
+ register unsigned long gp_in_global __asm__("gp");
+ 
+@@ -37,7 +38,7 @@ extern asmlinkage void ret_from_kernel_thread(void);
+ 
+ void arch_cpu_idle(void)
+ {
+-	wait_for_interrupt();
++	cpu_do_idle();
+ 	raw_local_irq_enable();
+ }
+ 
+-- 
+2.32.0
+

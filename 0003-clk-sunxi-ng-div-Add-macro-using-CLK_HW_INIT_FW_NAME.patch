@@ -1,0 +1,42 @@
+From 91a21b78e59dfffcc7a653af089683b4ccb24731 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Tue, 28 Sep 2021 03:03:29 -0500
+Subject: [PATCH 3/8] clk: sunxi-ng: div: Add macro using CLK_HW_INIT_FW_NAME
+
+To use the external clock references from the device tree, instead of
+hardcoded global names, parents should be referenced with .fw_name. Add
+a variant of the SUNXI_CCU_M_WITH_GATE initializer which does this.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/clk/sunxi-ng/ccu_div.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/drivers/clk/sunxi-ng/ccu_div.h b/drivers/clk/sunxi-ng/ccu_div.h
+index 6682fde6043c..4f8c78a4665b 100644
+--- a/drivers/clk/sunxi-ng/ccu_div.h
++++ b/drivers/clk/sunxi-ng/ccu_div.h
+@@ -166,6 +166,20 @@ struct ccu_div {
+ 	SUNXI_CCU_M_WITH_GATE(_struct, _name, _parent, _reg,		\
+ 			      _mshift, _mwidth, 0, _flags)
+ 
++#define SUNXI_CCU_M_FW_WITH_GATE(_struct, _name, _parent, _reg,		\
++				 _mshift, _mwidth, _gate, _flags)	\
++	struct ccu_div _struct = {					\
++		.enable	= _gate,					\
++		.div	= _SUNXI_CCU_DIV(_mshift, _mwidth),		\
++		.common	= {						\
++			.reg		= _reg,				\
++			.hw.init	= CLK_HW_INIT_FW_NAME(_name,	\
++							      _parent,	\
++							      &ccu_div_ops, \
++							      _flags),	\
++		},							\
++	}
++
+ static inline struct ccu_div *hw_to_ccu_div(struct clk_hw *hw)
+ {
+ 	struct ccu_common *common = hw_to_ccu_common(hw);
+-- 
+2.32.0
+

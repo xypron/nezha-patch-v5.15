@@ -1,0 +1,53 @@
+From f92e3ed3ba3c42a4f09a105ba177cf42a81b03f7 Mon Sep 17 00:00:00 2001
+From: Anup Patel <anup.patel@wdc.com>
+Date: Tue, 12 Oct 2021 15:28:51 +0530
+Subject: [PATCH 2/8] RISC-V: Rename relocate() and make it global
+
+The low-level relocate() function enables mmu and relocates
+execution to link-time addresses. We rename relocate() function
+to relocate_enable_mmu() function which is more informative.
+
+Also, the relocate_enable_mmu() function will be used in the
+resume path when a CPU wakes-up from a non-retentive suspend
+so we make it global symbol.
+
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
+ arch/riscv/kernel/head.S | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+index 52c5ff9804c5..7f8b9d961f13 100644
+--- a/arch/riscv/kernel/head.S
++++ b/arch/riscv/kernel/head.S
+@@ -79,7 +79,8 @@ pe_head_start:
+ 
+ .align 2
+ #ifdef CONFIG_MMU
+-relocate:
++	.global relocate_enable_mmu
++relocate_enable_mmu:
+ 	/* Relocate return address */
+ 	la a1, kernel_map
+ 	XIP_FIXUP_OFFSET a1
+@@ -174,7 +175,7 @@ secondary_start_common:
+ 	/* Enable virtual memory and relocate to virtual address */
+ 	la a0, swapper_pg_dir
+ 	XIP_FIXUP_OFFSET a0
+-	call relocate
++	call relocate_enable_mmu
+ #endif
+ 	call setup_trap_vector
+ 	tail smp_callin
+@@ -312,7 +313,7 @@ clear_bss_done:
+ #ifdef CONFIG_MMU
+ 	la a0, early_pg_dir
+ 	XIP_FIXUP_OFFSET a0
+-	call relocate
++	call relocate_enable_mmu
+ #endif /* CONFIG_MMU */
+ 
+ 	call setup_trap_vector
+-- 
+2.32.0
+

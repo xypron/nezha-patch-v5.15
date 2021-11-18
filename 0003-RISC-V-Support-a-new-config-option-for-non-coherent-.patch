@@ -1,0 +1,42 @@
+From ba05bf50c9cf68e555eadac57e01c882fed7592b Mon Sep 17 00:00:00 2001
+From: Atish Patra <atish.patra@wdc.com>
+Date: Sat, 11 Sep 2021 17:21:36 +0800
+Subject: [PATCH 3/6] RISC-V: Support a new config option for non-coherent DMA
+
+In future, there will be more RISC-V platforms with non-coherent DMA.
+Instead of selecting all the required config options in every soc, create
+a new config that selects all the required configs related non-coherent
+DMA.
+
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+
+RISC-V: Support DMA_DIRECT_REMAP for non-coherent DMA
+
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+---
+ arch/riscv/Kconfig | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 820a30903d7f..c05bb32e2991 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -235,6 +235,15 @@ config RELOCATABLE
+           relocation pass at runtime even if the kernel is loaded at the
+           same address it was linked at.
+ 
++config RISCV_DMA_NONCOHERENT
++	bool
++	select ARCH_HAS_DMA_PREP_COHERENT
++	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
++	select ARCH_HAS_SYNC_DMA_FOR_CPU
++	select ARCH_HAS_SETUP_DMA_OPS
++	select DMA_GLOBAL_POOL
++	select DMA_DIRECT_REMAP
++
+ source "arch/riscv/Kconfig.socs"
+ source "arch/riscv/Kconfig.erratas"
+ 
+-- 
+2.32.0
+

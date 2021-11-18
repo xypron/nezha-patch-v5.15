@@ -1,0 +1,43 @@
+From a71f16723571459bd1e763ba48fb88ba3318334d Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Tue, 28 Sep 2021 03:03:32 -0500
+Subject: [PATCH 6/8] rtc: sun6i: Allow probing without an early clock provider
+
+Some SoCs have an RTC supported by this RTC driver, but do not have an
+early clock provider declared here. Currently, this prevents the RTC
+driver from probing, because it expects a global struct to already be
+allocated. Fix probing the driver by copying the missing pieces from the
+clock provider setup function, replacing them with the devm variants.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/rtc/rtc-sun6i.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/rtc/rtc-sun6i.c b/drivers/rtc/rtc-sun6i.c
+index adec1b14a8de..711832c758ae 100644
+--- a/drivers/rtc/rtc-sun6i.c
++++ b/drivers/rtc/rtc-sun6i.c
+@@ -673,8 +673,17 @@ static int sun6i_rtc_probe(struct platform_device *pdev)
+ 	struct sun6i_rtc_dev *chip = sun6i_rtc;
+ 	int ret;
+ 
+-	if (!chip)
+-		return -ENODEV;
++	if (!chip) {
++		chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
++		if (!chip)
++			return -ENOMEM;
++
++		spin_lock_init(&chip->lock);
++
++		chip->base = devm_platform_ioremap_resource(pdev, 0);
++		if (IS_ERR(chip->base))
++			return PTR_ERR(chip->base);
++	}
+ 
+ 	platform_set_drvdata(pdev, chip);
+ 
+-- 
+2.32.0
+

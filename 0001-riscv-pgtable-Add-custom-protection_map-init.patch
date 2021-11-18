@@ -1,0 +1,110 @@
+From d8148eefd131bd6894f6c0e08e9762625a9fe103 Mon Sep 17 00:00:00 2001
+From: Guo Ren <guoren@linux.alibaba.com>
+Date: Sat, 11 Sep 2021 17:21:34 +0800
+Subject: [PATCH 1/6] riscv: pgtable: Add custom protection_map init
+
+Some RISC-V CPU vendors have defined their own PTE attributes to
+solve non-coherent DMA bus problems. That makes _P/SXXX definitions
+contain global variables which could be initialized at the early
+boot stage before setup_vm. The patch prevents compile errors.
+
+This patch is similar to 316d097c4cd4  (x86/pti: Filter at
+vma->vm_page_prot population) which give a choice for arch custom
+implementation.
+
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Cc: Atish Patra <atish.patra@wdc.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+---
+ arch/riscv/Kconfig   |  4 ++++
+ arch/riscv/mm/init.c | 22 ++++++++++++++++++++++
+ mm/mmap.c            |  4 ++++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 0b414e193516..820a30903d7f 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -23,6 +23,7 @@ config RISCV
+ 	select ARCH_HAS_GIGANTIC_PAGE
+ 	select ARCH_HAS_KCOV
+ 	select ARCH_HAS_MMIOWB
++	select ARCH_HAS_PROTECTION_MAP_INIT
+ 	select ARCH_HAS_PTE_SPECIAL
+ 	select ARCH_HAS_SET_DIRECT_MAP if MMU
+ 	select ARCH_HAS_SET_MEMORY if MMU
+@@ -211,6 +212,9 @@ config GENERIC_HWEIGHT
+ config FIX_EARLYCON_MEM
+ 	def_bool MMU
+ 
++config ARCH_HAS_PROTECTION_MAP_INIT
++	def_bool y
++
+ config PGTABLE_LEVELS
+ 	int
+ 	default 3 if 64BIT
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+index 42041c12d496..aec4dd14a615 100644
+--- a/arch/riscv/mm/init.c
++++ b/arch/riscv/mm/init.c
+@@ -594,6 +594,26 @@ static void __init create_kernel_page_table(pgd_t *pgdir, bool early)
+ }
+ #endif
+ 
++static void __init setup_protection_map(void)
++{
++	protection_map[0]  = __P000;
++	protection_map[1]  = __P001;
++	protection_map[2]  = __P010;
++	protection_map[3]  = __P011;
++	protection_map[4]  = __P100;
++	protection_map[5]  = __P101;
++	protection_map[6]  = __P110;
++	protection_map[7]  = __P111;
++	protection_map[8]  = __S000;
++	protection_map[9]  = __S001;
++	protection_map[10] = __S010;
++	protection_map[11] = __S011;
++	protection_map[12] = __S100;
++	protection_map[13] = __S101;
++	protection_map[14] = __S110;
++	protection_map[15] = __S111;
++}
++
+ /*
+  * Setup a 4MB mapping that encompasses the device tree: for 64-bit kernel,
+  * this means 2 PMD entries whereas for 32-bit kernel, this is only 1 PGDIR
+@@ -634,6 +654,8 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
+ {
+ 	pmd_t __maybe_unused fix_bmap_spmd, fix_bmap_epmd;
+ 
++	setup_protection_map();
++
+ 	kernel_map.virt_addr = KERNEL_LINK_ADDR;
+ 
+ #ifdef CONFIG_XIP_KERNEL
+diff --git a/mm/mmap.c b/mm/mmap.c
+index 88dcc5c25225..55b9da1f8b56 100644
+--- a/mm/mmap.c
++++ b/mm/mmap.c
+@@ -100,10 +100,14 @@ static void unmap_region(struct mm_struct *mm,
+  *								w: (no) no
+  *								x: (yes) yes
+  */
++#ifdef CONFIG_ARCH_HAS_PROTECTION_MAP_INIT
++pgprot_t protection_map[16] __ro_after_init;
++#else
+ pgprot_t protection_map[16] __ro_after_init = {
+ 	__P000, __P001, __P010, __P011, __P100, __P101, __P110, __P111,
+ 	__S000, __S001, __S010, __S011, __S100, __S101, __S110, __S111
+ };
++#endif
+ 
+ #ifndef CONFIG_ARCH_HAS_FILTER_PGPROT
+ static inline pgprot_t arch_filter_pgprot(pgprot_t prot)
+-- 
+2.32.0
+
