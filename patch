@@ -35,7 +35,7 @@ git am nezha-patch-v5.15/0006-riscv-soc-Add-Allwinner-SoC-kconfig-option.patch
 # already merged in next-20211117
 git am nezha-patch-v5.15/0001-dt-bindings-watchdog-sunxi-Add-compatibles-for-R329.patch
 git am nezha-patch-v5.15/0002-dt-bindings-watchdog-sunxi-Add-compatibles-for-D1.patch
-git am nezha-patch-v5.15/0003-watchdog-sunxi_wdt-Add-support-for-D1.patc
+git am nezha-patch-v5.15/0003-watchdog-sunxi_wdt-Add-support-for-D1.patch
 
 # https://lore.kernel.org/all/20210928080335.36706-1-samuel@sholland.org/
 git am nezha-patch-v5.15/0001-dt-bindings-rtc-sun6i-Clean-up-repetition.patch
