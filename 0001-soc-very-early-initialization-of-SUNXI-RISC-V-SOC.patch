@@ -1,4 +1,4 @@
-From bfd6cffb97cbd70bf4e760ae42a9deb7c92c3b8a Mon Sep 17 00:00:00 2001
+From fcfa3b6730613fac1743aac60d71ef603e54f61b Mon Sep 17 00:00:00 2001
 From: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
 Date: Thu, 18 Nov 2021 18:58:18 +0100
 Subject: [PATCH] soc: very early initialization of SUNXI RISC-V SOC
@@ -21,7 +21,7 @@ index 549159571d4f..0e9bb9071fad 100644
 +obj-$(CONFIG_SOC_SUNXI) +=	soc_sunxi_sysctl.o
 diff --git a/drivers/soc/sunxi/soc_sunxi_sysctl.c b/drivers/soc/sunxi/soc_sunxi_sysctl.c
 new file mode 100644
-index 000000000000..a79a4e51ed96
+index 000000000000..c49db72035d3
 --- /dev/null
 +++ b/drivers/soc/sunxi/soc_sunxi_sysctl.c
 @@ -0,0 +1,28 @@
@@ -41,7 +41,7 @@ index 000000000000..a79a4e51ed96
 +
 +	__riscv_pbmt.mask	= 0xf800000000000000;
 +	__riscv_pbmt.mt[MT_PMA]	= 0x7000000000000000;
-+	__riscv_pbmt.mt[MT_NC]	= 0
++	__riscv_pbmt.mt[MT_NC]	= 0;
 +	__riscv_pbmt.mt[MT_IO]	= BIT(63);
 +
 +}
