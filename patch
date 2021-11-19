@@ -16,15 +16,21 @@ git reset --hard v5.15.3
 
 # [PATCH 0/8] clk: sunxi-ng: Lifetime fixes and module support
 # https://lore.kernel.org/all/20210901050526.45673-1-samuel@sholland.org/
-# merged in Linux next
+# patches 1-3 merged in Linux next, patch 4 dropped, 5-8 new version
 git am $dir/0001-clk-sunxi-ng-Unregister-clocks-resets-when-unbinding.patch
 git am $dir/0002-clk-sunxi-ng-Prevent-unbinding-CCUs-via-sysfs.patch
 git am $dir/0003-clk-sunxi-ng-Use-a-separate-lock-for-each-CCU-instan.patch
-git am $dir/0004-clk-sunxi-ng-Rename-files-to-match-Kconfig-and-drive.patch
-git am $dir/0005-clk-sunxi-ng-Export-symbols-used-by-CCU-drivers.patch
-git am $dir/0006-clk-sunxi-ng-Allow-drivers-to-be-built-as-modules.patch
-git am $dir/0007-clk-sunxi-ng-Convert-early-providers-to-platform-dri.patch
-git am $dir/0008-clk-sunxi-ng-Allow-the-CCU-core-to-be-built-as-a-mod.patch
+
+# [PATCH] clk: sunxi-ng: Add machine dependency to A83T CCU
+# https://lore.kernel.org/all/20210902230200.29574-1-samuel@sholland.org/
+git am $dir/0001-clk-sunxi-ng-Add-machine-dependency-to-A83T-CCU.patch
+
+# [PATCH v3 0/4] clk: sunxi-ng: Module support
+# https://lore.kernel.org/all/20211119033338.25486-1-samuel@sholland.org/
+0001-clk-sunxi-ng-Export-symbols-used-by-CCU-drivers.patch
+0002-clk-sunxi-ng-Allow-drivers-to-be-built-as-modules.patch
+0003-clk-sunxi-ng-Convert-early-providers-to-platform-dri.patch
+0004-clk-sunxi-ng-Allow-the-CCU-core-to-be-built-as-a-mod.patch
 
 # https://lore.kernel.org/all/20210609121322.3058-1-anup.patel@wdc.com/
 git am $dir/0001-RISC-V-Use-SBI-SRST-extension-when-available.patch

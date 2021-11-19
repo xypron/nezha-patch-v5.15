@@ -1,0 +1,30 @@
+From c77a1e8a472ae0d4cc417e767ab3b2b840385bbc Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Thu, 2 Sep 2021 18:02:00 -0500
+Subject: [PATCH 1/1] clk: sunxi-ng: Add machine dependency to A83T CCU
+
+The CCUs for all other 32-bit SoCs have a dependency on a specific
+MACH_SUNxI symbol. This effectively hides these drivers when building
+an ARCH=arm64 kernel. However, the A83T CCU still shows up because it
+is missing this dependency. Let's add it for consistency.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/clk/sunxi-ng/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/sunxi-ng/Kconfig b/drivers/clk/sunxi-ng/Kconfig
+index cd46d8853876..e76e1676f0f0 100644
+--- a/drivers/clk/sunxi-ng/Kconfig
++++ b/drivers/clk/sunxi-ng/Kconfig
+@@ -71,6 +71,7 @@ config SUN8I_A33_CCU
+ config SUN8I_A83T_CCU
+ 	bool "Support for the Allwinner A83T CCU"
+ 	default MACH_SUN8I
++	depends on MACH_SUN8I || COMPILE_TEST
+ 
+ config SUN8I_H3_CCU
+ 	bool "Support for the Allwinner H3 CCU"
+-- 
+2.32.0
+
