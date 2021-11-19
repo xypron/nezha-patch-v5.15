@@ -1,6 +1,12 @@
 #/bin/sh
 
 set -e
+
+test -f Kbuild || \
+(echo 'This script must be executed in the Linux directory'; false)
+
+dir=$(dirname $0)
+
 git am --abort 2>/dev/null || true
 git rebase --abort 2>/dev/null || true
 
@@ -9,46 +15,46 @@ git checkout nezha-patch-v5.15 || git checkout -b nezha-patch-v5.15
 git reset --hard v5.15.3
 
 # https://lore.kernel.org/all/20210609121322.3058-1-anup.patel@wdc.com/
-git am nezha-patch-v5.15/0001-RISC-V-Use-SBI-SRST-extension-when-available.patch
+git am $dir/0001-RISC-V-Use-SBI-SRST-extension-when-available.patch
 
 # https://lore.kernel.org/all/20211012095857.1314214-1-anup.patel@wdc.com/
-git am nezha-patch-v5.15/0001-RISC-V-Enable-CPU_IDLE-drivers.patch
-git am nezha-patch-v5.15/0002-RISC-V-Rename-relocate-and-make-it-global.patch
-git am nezha-patch-v5.15/0003-RISC-V-Add-arch-functions-for-non-retentive-suspend-.patch
-git am nezha-patch-v5.15/0004-RISC-V-Add-SBI-HSM-suspend-related-defines.patch
-git am nezha-patch-v5.15/0005-cpuidle-Factor-out-power-domain-related-code-from-PS.patch
-git am nezha-patch-v5.15/0006-cpuidle-Add-RISC-V-SBI-CPU-idle-driver.patch
-git am nezha-patch-v5.15/0007-dt-bindings-Add-common-bindings-for-ARM-and-RISC-V-i.patch
-git am nezha-patch-v5.15/0008-RISC-V-Enable-RISC-V-SBI-CPU-Idle-driver-for-QEMU-vi.patch
+git am $dir/0001-RISC-V-Enable-CPU_IDLE-drivers.patch
+git am $dir/0002-RISC-V-Rename-relocate-and-make-it-global.patch
+git am $dir/0003-RISC-V-Add-arch-functions-for-non-retentive-suspend-.patch
+git am $dir/0004-RISC-V-Add-SBI-HSM-suspend-related-defines.patch
+git am $dir/0005-cpuidle-Factor-out-power-domain-related-code-from-PS.patch
+git am $dir/0006-cpuidle-Add-RISC-V-SBI-CPU-idle-driver.patch
+git am $dir/0007-dt-bindings-Add-common-bindings-for-ARM-and-RISC-V-i.patch
+git am $dir/0008-RISC-V-Enable-RISC-V-SBI-CPU-Idle-driver-for-QEMU-vi.patch
 
 # https://lore.kernel.org/all/20211009171259.2515351-1-alexandre.ghiti@canonical.com/
-git am nezha-patch-v5.15/0001-riscv-Introduce-CONFIG_RELOCATABLE.patch
-git am nezha-patch-v5.15/0002-powerpc-Move-script-to-check-relocations-at-compile-.patch
-git am nezha-patch-v5.15/0003-riscv-Check-relocations-at-compile-time.patch
+git am $dir/0001-riscv-Introduce-CONFIG_RELOCATABLE.patch
+git am $dir/0002-powerpc-Move-script-to-check-relocations-at-compile-.patch
+git am $dir/0003-riscv-Check-relocations-at-compile-time.patch
 
 # https://lore.kernel.org/all/20210911092139.79607-1-guoren@kernel.org/
-git am nezha-patch-v5.15/0001-riscv-pgtable-Add-custom-protection_map-init.patch
-git am nezha-patch-v5.15/0002-riscv-errata-pgtable-Add-custom-Svpbmt-supported-for.patch
-git am nezha-patch-v5.15/0003-RISC-V-Support-a-new-config-option-for-non-coherent-.patch
-git am nezha-patch-v5.15/0004-RISC-V-Implement-arch_sync_dma-functions.patch
-git am nezha-patch-v5.15/0005-riscv-errata-Support-T-HEAD-custom-dcache-ops.patch
-git am nezha-patch-v5.15/0006-riscv-soc-Add-Allwinner-SoC-kconfig-option.patch
+git am $dir/0001-riscv-pgtable-Add-custom-protection_map-init.patch
+git am $dir/0002-riscv-errata-pgtable-Add-custom-Svpbmt-supported-for.patch
+git am $dir/0003-RISC-V-Support-a-new-config-option-for-non-coherent-.patch
+git am $dir/0004-RISC-V-Implement-arch_sync_dma-functions.patch
+git am $dir/0005-riscv-errata-Support-T-HEAD-custom-dcache-ops.patch
+git am $dir/0006-riscv-soc-Add-Allwinner-SoC-kconfig-option.patch
 
 # https://lore.kernel.org/all/20210902225750.29313-1-samuel@sholland.org/
 # already merged in next-20211117
-git am nezha-patch-v5.15/0001-dt-bindings-watchdog-sunxi-Add-compatibles-for-R329.patch
-git am nezha-patch-v5.15/0002-dt-bindings-watchdog-sunxi-Add-compatibles-for-D1.patch
-git am nezha-patch-v5.15/0003-watchdog-sunxi_wdt-Add-support-for-D1.patch
+git am $dir/0001-dt-bindings-watchdog-sunxi-Add-compatibles-for-R329.patch
+git am $dir/0002-dt-bindings-watchdog-sunxi-Add-compatibles-for-D1.patch
+git am $dir/0003-watchdog-sunxi_wdt-Add-support-for-D1.patch
 
 # https://lore.kernel.org/all/20210928080335.36706-1-samuel@sholland.org/
-git am nezha-patch-v5.15/0001-dt-bindings-rtc-sun6i-Clean-up-repetition.patch
-git am nezha-patch-v5.15/0002-dt-bindings-rtc-sun6i-Add-H616-R329-and-D1-support.patch
-git am nezha-patch-v5.15/0003-clk-sunxi-ng-div-Add-macro-using-CLK_HW_INIT_FW_NAME.patch
-git am nezha-patch-v5.15/0004-clk-sunxi-ng-mux-Add-macro-using-CLK_HW_INIT_PARENTS.patch
-git am nezha-patch-v5.15/0005-clk-sunxi-ng-mux-Allow-muxes-to-have-keys.patch
-git am nezha-patch-v5.15/0006-rtc-sun6i-Allow-probing-without-an-early-clock-provi.patch
-git am nezha-patch-v5.15/0007-clk-sunxi-ng-Add-support-for-the-sun6i-RTC-clocks.patch
-git am nezha-patch-v5.15/0008-clk-sunxi-ng-sun6i-rtc-Add-support-for-H6.patch
+git am $dir/0001-dt-bindings-rtc-sun6i-Clean-up-repetition.patch
+git am $dir/0002-dt-bindings-rtc-sun6i-Add-H616-R329-and-D1-support.patch
+git am $dir/0003-clk-sunxi-ng-div-Add-macro-using-CLK_HW_INIT_FW_NAME.patch
+git am $dir/0004-clk-sunxi-ng-mux-Add-macro-using-CLK_HW_INIT_PARENTS.patch
+git am $dir/0005-clk-sunxi-ng-mux-Allow-muxes-to-have-keys.patch
+git am $dir/0006-rtc-sun6i-Allow-probing-without-an-early-clock-provi.patch
+git am $dir/0007-clk-sunxi-ng-Add-support-for-the-sun6i-RTC-clocks.patch
+git am $dir/0008-clk-sunxi-ng-sun6i-rtc-Add-support-for-H6.patch
 
 # todo:
-git am nezha-patch-v5.15/0001-soc-very-early-initialization-of-SUNXI-RISC-V-SOC.patch
+git am $dir/0001-soc-very-early-initialization-of-SUNXI-RISC-V-SOC.patch
