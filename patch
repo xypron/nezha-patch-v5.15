@@ -2,6 +2,9 @@
 
 set -e
 git am --abort 2>/dev/null || true
+git rebase --abort 2>/dev/null || true
+
+git checkout nezha-patch-v5.15 || git checkout -b nezha-patch-v5.15
 
 git reset --hard v5.15.3
 
