@@ -1,0 +1,35 @@
+From 0b6c482358991e48022edc3caecf0c8876d26a17 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 13 Jun 2021 23:18:44 -0500
+Subject: [PATCH 1/5] dt-bindings: mmc: sunxi: Add D1 MMC and eMMC compatibles
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ .../devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml      | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml b/Documentation/devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml
+index 4f62ad6ce50c..94e2c6c4e4b7 100644
+--- a/Documentation/devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml
++++ b/Documentation/devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml
+@@ -24,6 +24,7 @@ properties:
+       - const: allwinner,sun7i-a20-mmc
+       - const: allwinner,sun8i-a83t-emmc
+       - const: allwinner,sun9i-a80-mmc
++      - const: allwinner,sun20i-d1-mmc
+       - const: allwinner,sun50i-a64-emmc
+       - const: allwinner,sun50i-a64-mmc
+       - const: allwinner,sun50i-a100-emmc
+@@ -49,6 +50,9 @@ properties:
+       - items:
+           - const: allwinner,sun50i-h6-mmc
+           - const: allwinner,sun50i-a64-mmc
++      - items:
++          - const: allwinner,sun20i-d1-emmc
++          - const: allwinner,sun50i-a100-emmc
+       - items:
+           - const: allwinner,sun50i-h616-emmc
+           - const: allwinner,sun50i-a100-emmc
+-- 
+2.32.0
+

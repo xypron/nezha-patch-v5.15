@@ -1,0 +1,40 @@
+From d734f3afd741796d476ea7e5ecb116ea4082a6dc Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 13 Jun 2021 23:16:55 -0500
+Subject: [PATCH 4/5] mmc: sunxi-mmc: Add D1 MMC compatible
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/mmc/host/sunxi-mmc.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/mmc/host/sunxi-mmc.c b/drivers/mmc/host/sunxi-mmc.c
+index d99aba9d7304..cde3e8dbc94b 100644
+--- a/drivers/mmc/host/sunxi-mmc.c
++++ b/drivers/mmc/host/sunxi-mmc.c
+@@ -1170,6 +1170,14 @@ static const struct sunxi_mmc_cfg sun9i_a80_cfg = {
+ 	.can_calibrate = false,
+ };
+ 
++static const struct sunxi_mmc_cfg sun20i_d1_cfg = {
++	.idma_des_size_bits = 13,
++	.idma_des_shift = 2,
++	.can_calibrate = true,
++	.mask_data0 = true,
++	.needs_new_timings = true,
++};
++
+ static const struct sunxi_mmc_cfg sun50i_a64_cfg = {
+ 	.idma_des_size_bits = 16,
+ 	.clk_delays = NULL,
+@@ -1208,6 +1216,7 @@ static const struct of_device_id sunxi_mmc_of_match[] = {
+ 	{ .compatible = "allwinner,sun7i-a20-mmc", .data = &sun7i_a20_cfg },
+ 	{ .compatible = "allwinner,sun8i-a83t-emmc", .data = &sun8i_a83t_emmc_cfg },
+ 	{ .compatible = "allwinner,sun9i-a80-mmc", .data = &sun9i_a80_cfg },
++	{ .compatible = "allwinner,sun20i-d1-mmc", .data = &sun20i_d1_cfg },
+ 	{ .compatible = "allwinner,sun50i-a64-mmc", .data = &sun50i_a64_cfg },
+ 	{ .compatible = "allwinner,sun50i-a64-emmc", .data = &sun50i_a64_emmc_cfg },
+ 	{ .compatible = "allwinner,sun50i-a100-mmc", .data = &sun50i_a100_cfg },
+-- 
+2.32.0
+

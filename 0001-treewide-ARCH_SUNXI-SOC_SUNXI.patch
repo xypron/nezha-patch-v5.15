@@ -1,0 +1,399 @@
+From 3f03ace30073d6249ef5bffecc8759fb5f1012b7 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 16 May 2021 21:17:16 -0500
+Subject: [PATCH 1/1] treewide: ARCH_SUNXI += SOC_SUNXI
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/bus/Kconfig                         | 4 ++--
+ drivers/clk/sunxi-ng/Kconfig                | 4 ++--
+ drivers/crypto/allwinner/Kconfig            | 5 ++---
+ drivers/dma/Kconfig                         | 2 +-
+ drivers/gpu/drm/sun4i/Kconfig               | 2 +-
+ drivers/hwspinlock/Kconfig                  | 2 +-
+ drivers/i2c/busses/Kconfig                  | 2 +-
+ drivers/input/keyboard/Kconfig              | 2 +-
+ drivers/iommu/Kconfig                       | 3 +--
+ drivers/media/platform/Kconfig              | 2 +-
+ drivers/media/rc/Kconfig                    | 2 +-
+ drivers/mfd/Kconfig                         | 2 +-
+ drivers/mmc/host/Kconfig                    | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig | 4 ++--
+ drivers/nvmem/Kconfig                       | 2 +-
+ drivers/phy/allwinner/Kconfig               | 4 ++--
+ drivers/pwm/Kconfig                         | 2 +-
+ drivers/reset/Kconfig                       | 2 +-
+ drivers/rtc/Kconfig                         | 2 +-
+ drivers/soc/sunxi/Kconfig                   | 2 +-
+ drivers/spi/Kconfig                         | 2 +-
+ drivers/staging/media/sunxi/Kconfig         | 2 +-
+ drivers/thermal/Kconfig                     | 2 +-
+ drivers/usb/musb/Kconfig                    | 2 +-
+ drivers/watchdog/Kconfig                    | 2 +-
+ sound/soc/sunxi/Kconfig                     | 2 +-
+ 26 files changed, 31 insertions(+), 33 deletions(-)
+
+diff --git a/drivers/bus/Kconfig b/drivers/bus/Kconfig
+index a4cf3d692dc3..e03364758d28 100644
+--- a/drivers/bus/Kconfig
++++ b/drivers/bus/Kconfig
+@@ -154,8 +154,8 @@ config QCOM_EBI2
+ 
+ config SUN50I_DE2_BUS
+ 	bool "Allwinner A64 DE2 Bus Driver"
+-	  default ARM64
+-	  depends on ARCH_SUNXI
++	  default (ARM64 && ARCH_SUNXI) || SOC_SUNXI
++	  depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	  select SUNXI_SRAM
+ 	  help
+ 	  Say y here to enable support for Allwinner A64 DE2 bus driver. It's
+diff --git a/drivers/clk/sunxi-ng/Kconfig b/drivers/clk/sunxi-ng/Kconfig
+index 695e0e407ace..411738a487c3 100644
+--- a/drivers/clk/sunxi-ng/Kconfig
++++ b/drivers/clk/sunxi-ng/Kconfig
+@@ -1,9 +1,9 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config SUNXI_CCU
+ 	bool "Clock support for Allwinner SoCs"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	default ARCH_SUNXI || SOC_SUNXI
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	select RESET_CONTROLLER
+-	default ARCH_SUNXI
+ 
+ if SUNXI_CCU
+ 
+diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
+index b8e75210a0e3..3d52e77822bd 100644
+--- a/drivers/crypto/allwinner/Kconfig
++++ b/drivers/crypto/allwinner/Kconfig
+@@ -1,13 +1,12 @@
+ config CRYPTO_DEV_ALLWINNER
+ 	bool "Support for Allwinner cryptographic offloader"
+-	depends on ARCH_SUNXI || COMPILE_TEST
+-	default y if ARCH_SUNXI
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
++	default y if ARCH_SUNXI || SOC_SUNXI
+ 	help
+ 	  Say Y here to get to see options for Allwinner hardware crypto devices
+ 
+ config CRYPTO_DEV_SUN4I_SS
+ 	tristate "Support for Allwinner Security System cryptographic accelerator"
+-	depends on ARCH_SUNXI
+ 	depends on PM
+ 	depends on CRYPTO_DEV_ALLWINNER
+ 	select CRYPTO_MD5
+diff --git a/drivers/dma/Kconfig b/drivers/dma/Kconfig
+index 80c2c03cb014..da74f443673b 100644
+--- a/drivers/dma/Kconfig
++++ b/drivers/dma/Kconfig
+@@ -163,7 +163,7 @@ config DMA_SUN4I
+ 
+ config DMA_SUN6I
+ 	tristate "Allwinner A31 SoCs DMA support"
+-	depends on MACH_SUN6I || MACH_SUN8I || (ARM64 && ARCH_SUNXI) || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on RESET_CONTROLLER
+ 	select DMA_ENGINE
+ 	select DMA_VIRTUAL_CHANNELS
+diff --git a/drivers/gpu/drm/sun4i/Kconfig b/drivers/gpu/drm/sun4i/Kconfig
+index 5755f0432e77..8466404df1c8 100644
+--- a/drivers/gpu/drm/sun4i/Kconfig
++++ b/drivers/gpu/drm/sun4i/Kconfig
+@@ -2,7 +2,7 @@
+ config DRM_SUN4I
+ 	tristate "DRM Support for Allwinner A10 Display Engine"
+ 	depends on DRM && (ARM || ARM64) && COMMON_CLK
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	select DRM_GEM_CMA_HELPER
+ 	select DRM_KMS_HELPER
+ 	select DRM_KMS_CMA_HELPER
+diff --git a/drivers/hwspinlock/Kconfig b/drivers/hwspinlock/Kconfig
+index 3874d15b0e9b..ddd31350a026 100644
+--- a/drivers/hwspinlock/Kconfig
++++ b/drivers/hwspinlock/Kconfig
+@@ -46,7 +46,7 @@ config HWSPINLOCK_STM32
+ 
+ config HWSPINLOCK_SUN6I
+ 	tristate "SUN6I Hardware Spinlock device"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  Say y here to support the SUN6I Hardware Spinlock device which can be
+ 	  found in most of the sun6i compatible Allwinner SoCs.
+diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
+index e17790fe35a7..61b1bebc8041 100644
+--- a/drivers/i2c/busses/Kconfig
++++ b/drivers/i2c/busses/Kconfig
+@@ -786,7 +786,7 @@ config I2C_MT7621
+ 
+ config I2C_MV64XXX
+ 	tristate "Marvell mv64xxx I2C Controller"
+-	depends on PLAT_ORION || ARCH_SUNXI || ARCH_MVEBU || COMPILE_TEST
++	depends on PLAT_ORION || ARCH_MVEBU || ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  If you say yes to this option, support will be included for the
+ 	  built-in I2C interface on the Marvell 64xxx line of host bridges.
+diff --git a/drivers/input/keyboard/Kconfig b/drivers/input/keyboard/Kconfig
+index e75650e98c9e..900561387b8d 100644
+--- a/drivers/input/keyboard/Kconfig
++++ b/drivers/input/keyboard/Kconfig
+@@ -632,7 +632,7 @@ config KEYBOARD_STMPE
+ 
+ config KEYBOARD_SUN4I_LRADC
+ 	tristate "Allwinner sun4i low res adc attached tablet keys support"
+-	depends on ARCH_SUNXI
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  This selects support for the Allwinner low res adc attached tablet
+ 	  keys found on Allwinner sunxi SoCs.
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index 3eb68fa1b8cc..ecf46b2b865d 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -220,8 +220,7 @@ config ROCKCHIP_IOMMU
+ config SUN50I_IOMMU
+ 	bool "Allwinner H6 IOMMU Support"
+ 	depends on HAS_DMA
+-	depends on ARCH_SUNXI || COMPILE_TEST
+-	select ARM_DMA_USE_IOMMU
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	select IOMMU_API
+ 	help
+ 	  Support for the IOMMU introduced in the Allwinner H6 SoCs.
+diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
+index 80321e03809a..b9cc9277831e 100644
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -577,7 +577,7 @@ config VIDEO_QCOM_VENUS
+ config VIDEO_SUN8I_DEINTERLACE
+ 	tristate "Allwinner Deinterlace driver"
+ 	depends on VIDEO_DEV && VIDEO_V4L2
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on COMMON_CLK && OF
+ 	depends on PM
+ 	select VIDEOBUF2_DMA_CONTIG
+diff --git a/drivers/media/rc/Kconfig b/drivers/media/rc/Kconfig
+index fd5a7a058714..355c55211315 100644
+--- a/drivers/media/rc/Kconfig
++++ b/drivers/media/rc/Kconfig
+@@ -431,7 +431,7 @@ config RC_ST
+ 
+ config IR_SUNXI
+ 	tristate "SUNXI IR remote control"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	   Say Y if you want to use sunXi internal IR Controller
+ 
+diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+index d2f345245538..3329da38c458 100644
+--- a/drivers/mfd/Kconfig
++++ b/drivers/mfd/Kconfig
+@@ -56,7 +56,7 @@ config MFD_SUN4I_GPADC
+ 	select MFD_CORE
+ 	select REGMAP_MMIO
+ 	select REGMAP_IRQ
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on !TOUCHSCREEN_SUN4I
+ 	help
+ 	  Select this to get support for Allwinner SoCs (A10, A13 and A31) ADC.
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index ccc148cdb5ee..4865e4d9e231 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -963,7 +963,7 @@ config MMC_REALTEK_USB
+ 
+ config MMC_SUNXI
+ 	tristate "Allwinner sunxi SD/MMC Host Controller support"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  This selects support for the SD/MMC Host Controller on
+ 	  Allwinner sunxi SoCs.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index 929cfc22cd0c..a41e570683c8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -199,8 +199,8 @@ config DWMAC_SUNXI
+ 
+ config DWMAC_SUN8I
+ 	tristate "Allwinner sun8i GMAC support"
+-	default ARCH_SUNXI
+-	depends on OF && (ARCH_SUNXI || COMPILE_TEST)
++	default ARCH_SUNXI || SOC_SUNXI
++	depends on OF && (ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST)
+ 	select MDIO_BUS_MUX
+ 	help
+ 	  Support for Allwinner H3 A83T A64 EMAC ethernet controllers.
+diff --git a/drivers/nvmem/Kconfig b/drivers/nvmem/Kconfig
+index da414617a54d..8d5a9898f11f 100644
+--- a/drivers/nvmem/Kconfig
++++ b/drivers/nvmem/Kconfig
+@@ -184,7 +184,7 @@ config NVMEM_STM32_ROMEM
+ 
+ config NVMEM_SUNXI_SID
+ 	tristate "Allwinner SoCs SID support"
+-	depends on ARCH_SUNXI
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  This is a driver for the 'security ID' available on various Allwinner
+ 	  devices.
+diff --git a/drivers/phy/allwinner/Kconfig b/drivers/phy/allwinner/Kconfig
+index fb584518b2d0..c2b820e33b4e 100644
+--- a/drivers/phy/allwinner/Kconfig
++++ b/drivers/phy/allwinner/Kconfig
+@@ -4,7 +4,7 @@
+ #
+ config PHY_SUN4I_USB
+ 	tristate "Allwinner sunxi SoC USB PHY driver"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on HAS_IOMEM
+ 	depends on RESET_CONTROLLER
+ 	depends on EXTCON
+@@ -21,7 +21,7 @@ config PHY_SUN4I_USB
+ 
+ config PHY_SUN6I_MIPI_DPHY
+ 	tristate "Allwinner A31 MIPI D-PHY Support"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on HAS_IOMEM && COMMON_CLK
+ 	depends on RESET_CONTROLLER
+ 	select GENERIC_PHY
+diff --git a/drivers/pwm/Kconfig b/drivers/pwm/Kconfig
+index aa29841bbb79..6b181a9a6b3b 100644
+--- a/drivers/pwm/Kconfig
++++ b/drivers/pwm/Kconfig
+@@ -562,7 +562,7 @@ config PWM_STMPE
+ 
+ config PWM_SUN4I
+ 	tristate "Allwinner PWM support"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on HAS_IOMEM && COMMON_CLK
+ 	help
+ 	  Generic PWM framework driver for Allwinner SoCs.
+diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
+index b0056ae5d463..51334cfc3ab7 100644
+--- a/drivers/reset/Kconfig
++++ b/drivers/reset/Kconfig
+@@ -201,7 +201,7 @@ config RESET_SCMI
+ 
+ config RESET_SIMPLE
+ 	bool "Simple Reset Controller Driver" if COMPILE_TEST
+-	default ARCH_ASPEED || ARCH_BCM4908 || ARCH_BITMAIN || ARCH_REALTEK || ARCH_STM32 || (ARCH_INTEL_SOCFPGA && ARM64) || ARCH_SUNXI || ARC
++	default ARCH_ASPEED || ARCH_BCM4908 || ARCH_BITMAIN || ARCH_REALTEK || ARCH_STM32 || (ARCH_INTEL_SOCFPGA && ARM64) || ARCH_SUNXI || ARC || SOC_SUNXI
+ 	help
+ 	  This enables a simple reset controller driver for reset lines that
+ 	  that can be asserted and deasserted by toggling bits in a contiguous,
+diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+index e1bc5214494e..c03bd9e85d93 100644
+--- a/drivers/rtc/Kconfig
++++ b/drivers/rtc/Kconfig
+@@ -1568,7 +1568,7 @@ config RTC_DRV_SUN6I
+ 	bool "Allwinner A31 RTC"
+ 	default MACH_SUN6I || MACH_SUN8I
+ 	depends on COMMON_CLK
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  If you say Y here you will get support for the RTC found in
+ 	  some Allwinner SoCs like the A31 or the A64.
+diff --git a/drivers/soc/sunxi/Kconfig b/drivers/soc/sunxi/Kconfig
+index 1fef0e711056..7a81fa455e1a 100644
+--- a/drivers/soc/sunxi/Kconfig
++++ b/drivers/soc/sunxi/Kconfig
+@@ -12,7 +12,7 @@ config SUNXI_MBUS
+ 
+ config SUNXI_SRAM
+ 	bool
+-	default ARCH_SUNXI
++	default ARCH_SUNXI || SOC_SUNXI
+ 	select REGMAP_MMIO
+ 	help
+ 	  Say y here to enable the SRAM controller support. This
+diff --git a/drivers/spi/Kconfig b/drivers/spi/Kconfig
+index 83e352b0c8f9..c87b182968d2 100644
+--- a/drivers/spi/Kconfig
++++ b/drivers/spi/Kconfig
+@@ -839,7 +839,7 @@ config SPI_SUN4I
+ 
+ config SPI_SUN6I
+ 	tristate "Allwinner A31 SPI controller"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on RESET_CONTROLLER
+ 	help
+ 	  This enables using the SPI controller on the Allwinner A31 SoCs.
+diff --git a/drivers/staging/media/sunxi/Kconfig b/drivers/staging/media/sunxi/Kconfig
+index 4549a135741f..ed81e2ddf1eb 100644
+--- a/drivers/staging/media/sunxi/Kconfig
++++ b/drivers/staging/media/sunxi/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config VIDEO_SUNXI
+ 	bool "Allwinner sunXi family Video Devices"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	help
+ 	  If you have an Allwinner SoC based on the sunXi family, say Y.
+ 
+diff --git a/drivers/thermal/Kconfig b/drivers/thermal/Kconfig
+index d7f44deab5b1..f0836770d046 100644
+--- a/drivers/thermal/Kconfig
++++ b/drivers/thermal/Kconfig
+@@ -314,7 +314,7 @@ config SPEAR_THERMAL
+ 
+ config SUN8I_THERMAL
+ 	tristate "Allwinner sun8i thermal driver"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on HAS_IOMEM
+ 	depends on NVMEM
+ 	depends on OF
+diff --git a/drivers/usb/musb/Kconfig b/drivers/usb/musb/Kconfig
+index 4d61df6a9b5c..2b860ca28a85 100644
+--- a/drivers/usb/musb/Kconfig
++++ b/drivers/usb/musb/Kconfig
+@@ -63,7 +63,7 @@ comment "Platform Glue Layer"
+ 
+ config USB_MUSB_SUNXI
+ 	tristate "Allwinner (sunxi)"
+-	depends on ARCH_SUNXI
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on NOP_USB_XCEIV
+ 	depends on PHY_SUN4I_USB
+ 	depends on EXTCON
+diff --git a/drivers/watchdog/Kconfig b/drivers/watchdog/Kconfig
+index d937f957f8df..1d7d3252dd63 100644
+--- a/drivers/watchdog/Kconfig
++++ b/drivers/watchdog/Kconfig
+@@ -622,7 +622,7 @@ config RN5T618_WATCHDOG
+ 
+ config SUNXI_WATCHDOG
+ 	tristate "Allwinner SoCs watchdog support"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	select WATCHDOG_CORE
+ 	help
+ 	  Say Y here to include support for the watchdog timer
+diff --git a/sound/soc/sunxi/Kconfig b/sound/soc/sunxi/Kconfig
+index ddcaaa98d3cb..86f6428dbdee 100644
+--- a/sound/soc/sunxi/Kconfig
++++ b/sound/soc/sunxi/Kconfig
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ menu "Allwinner SoC Audio support"
+-	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 
+ config SND_SUN4I_CODEC
+ 	tristate "Allwinner A10 Codec Support"
+-- 
+2.32.0
+

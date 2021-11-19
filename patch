@@ -56,6 +56,16 @@ git am $dir/0006-rtc-sun6i-Allow-probing-without-an-early-clock-provi.patch
 git am $dir/0007-clk-sunxi-ng-Add-support-for-the-sun6i-RTC-clocks.patch
 git am $dir/0008-clk-sunxi-ng-sun6i-rtc-Add-support-for-H6.patch
 
+# 0107
+git am $dir/0001-treewide-ARCH_SUNXI-SOC_SUNXI.patch
+
+# 0055-0059 MMC
+git am $dir/0001-dt-bindings-mmc-sunxi-Add-D1-MMC-and-eMMC-compatible.patch
+git am $dir/0002-mmc-sunxi-mmc-Correct-the-maximum-transfer-size.patch
+git am $dir/0003-mmc-sunxi-mmc-Fix-DMA-descriptors-above-32-bits.patch
+git am $dir/0004-mmc-sunxi-mmc-Add-D1-MMC-compatible.patch
+git am $dir/0005-mmc-sunxi-mmc-Add-more-registers.patch
+
 # todo:
 git am $dir/0001-Nezha-defconfig.patch
 
