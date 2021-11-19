@@ -1,0 +1,62 @@
+From 5d423717985fd5d94b286b6509b23df10f84ea54 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 1 Sep 2021 00:05:21 -0500
+Subject: [PATCH 3/8] clk: sunxi-ng: Use a separate lock for each CCU instance
+
+Some platforms have more than one CCU driver loaded: the main CCU, the
+PRCM, the display engine, and possibly others. All of these hardware
+blocks have separate MMIO spaces, so there is no need to synchronize
+between them.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/clk/sunxi-ng/ccu_common.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/clk/sunxi-ng/ccu_common.c b/drivers/clk/sunxi-ng/ccu_common.c
+index 88cb569e5835..31af8b6b5286 100644
+--- a/drivers/clk/sunxi-ng/ccu_common.c
++++ b/drivers/clk/sunxi-ng/ccu_common.c
+@@ -17,11 +17,10 @@
+ 
+ struct sunxi_ccu {
+ 	const struct sunxi_ccu_desc	*desc;
++	spinlock_t			lock;
+ 	struct ccu_reset		reset;
+ };
+ 
+-static DEFINE_SPINLOCK(ccu_lock);
+-
+ void ccu_helper_wait_for_lock(struct ccu_common *common, u32 lock)
+ {
+ 	void __iomem *addr;
+@@ -94,6 +93,8 @@ static int sunxi_ccu_probe(struct sunxi_ccu *ccu, struct device *dev,
+ 
+ 	ccu->desc = desc;
+ 
++	spin_lock_init(&ccu->lock);
++
+ 	for (i = 0; i < desc->num_ccu_clks; i++) {
+ 		struct ccu_common *cclk = desc->ccu_clks[i];
+ 
+@@ -101,7 +102,7 @@ static int sunxi_ccu_probe(struct sunxi_ccu *ccu, struct device *dev,
+ 			continue;
+ 
+ 		cclk->base = reg;
+-		cclk->lock = &ccu_lock;
++		cclk->lock = &ccu->lock;
+ 	}
+ 
+ 	for (i = 0; i < desc->hw_clks->num ; i++) {
+@@ -133,7 +134,7 @@ static int sunxi_ccu_probe(struct sunxi_ccu *ccu, struct device *dev,
+ 	reset->rcdev.owner = dev ? dev->driver->owner : THIS_MODULE;
+ 	reset->rcdev.nr_resets = desc->num_resets;
+ 	reset->base = reg;
+-	reset->lock = &ccu_lock;
++	reset->lock = &ccu->lock;
+ 	reset->reset_map = desc->resets;
+ 
+ 	ret = reset_controller_register(&reset->rcdev);
+-- 
+2.32.0
+

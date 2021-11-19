@@ -1,0 +1,165 @@
+From 89dab9c1fcfacd29526f3548053115a556ab6d76 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 1 Sep 2021 00:05:23 -0500
+Subject: [PATCH 5/8] clk: sunxi-ng: Export symbols used by CCU drivers
+
+For the individual drivers to be built as modules, the ops structs and
+callback registration functions must be exported. None of the helper
+functions are exported, because they are only referenced from the
+corresponding ops structs. of_sunxi_ccu_probe is not exported, because
+it is only used for built-in early OF clock providers.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/clk/sunxi-ng/ccu_common.c | 2 ++
+ drivers/clk/sunxi-ng/ccu_div.c    | 1 +
+ drivers/clk/sunxi-ng/ccu_gate.c   | 1 +
+ drivers/clk/sunxi-ng/ccu_mp.c     | 2 ++
+ drivers/clk/sunxi-ng/ccu_mult.c   | 1 +
+ drivers/clk/sunxi-ng/ccu_mux.c    | 2 ++
+ drivers/clk/sunxi-ng/ccu_nk.c     | 1 +
+ drivers/clk/sunxi-ng/ccu_nkm.c    | 1 +
+ drivers/clk/sunxi-ng/ccu_nkmp.c   | 1 +
+ drivers/clk/sunxi-ng/ccu_nm.c     | 1 +
+ drivers/clk/sunxi-ng/ccu_phase.c  | 1 +
+ drivers/clk/sunxi-ng/ccu_reset.c  | 1 +
+ 12 files changed, 15 insertions(+)
+
+diff --git a/drivers/clk/sunxi-ng/ccu_common.c b/drivers/clk/sunxi-ng/ccu_common.c
+index 31af8b6b5286..3ab109582646 100644
+--- a/drivers/clk/sunxi-ng/ccu_common.c
++++ b/drivers/clk/sunxi-ng/ccu_common.c
+@@ -83,6 +83,7 @@ int ccu_pll_notifier_register(struct ccu_pll_nb *pll_nb)
+ 	return clk_notifier_register(pll_nb->common->hw.clk,
+ 				     &pll_nb->clk_nb);
+ }
++EXPORT_SYMBOL_GPL(ccu_pll_notifier_register);
+ 
+ static int sunxi_ccu_probe(struct sunxi_ccu *ccu, struct device *dev,
+ 			   struct device_node *node, void __iomem *reg,
+@@ -194,6 +195,7 @@ int devm_sunxi_ccu_probe(struct device *dev, void __iomem *reg,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(devm_sunxi_ccu_probe);
+ 
+ void of_sunxi_ccu_probe(struct device_node *node, void __iomem *reg,
+ 			const struct sunxi_ccu_desc *desc)
+diff --git a/drivers/clk/sunxi-ng/ccu_div.c b/drivers/clk/sunxi-ng/ccu_div.c
+index 4c297089483c..74f82a5e340a 100644
+--- a/drivers/clk/sunxi-ng/ccu_div.c
++++ b/drivers/clk/sunxi-ng/ccu_div.c
+@@ -141,3 +141,4 @@ const struct clk_ops ccu_div_ops = {
+ 	.recalc_rate	= ccu_div_recalc_rate,
+ 	.set_rate	= ccu_div_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_div_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_gate.c b/drivers/clk/sunxi-ng/ccu_gate.c
+index 3d5ca092b08f..3c568efaabff 100644
+--- a/drivers/clk/sunxi-ng/ccu_gate.c
++++ b/drivers/clk/sunxi-ng/ccu_gate.c
+@@ -124,3 +124,4 @@ const struct clk_ops ccu_gate_ops = {
+ 	.set_rate	= ccu_gate_set_rate,
+ 	.recalc_rate	= ccu_gate_recalc_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_gate_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_mp.c b/drivers/clk/sunxi-ng/ccu_mp.c
+index 9d3a76604d94..cef8e7cba555 100644
+--- a/drivers/clk/sunxi-ng/ccu_mp.c
++++ b/drivers/clk/sunxi-ng/ccu_mp.c
+@@ -245,6 +245,7 @@ const struct clk_ops ccu_mp_ops = {
+ 	.recalc_rate	= ccu_mp_recalc_rate,
+ 	.set_rate	= ccu_mp_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_mp_ops);
+ 
+ /*
+  * Support for MMC timing mode switching
+@@ -325,3 +326,4 @@ const struct clk_ops ccu_mp_mmc_ops = {
+ 	.recalc_rate	= ccu_mp_mmc_recalc_rate,
+ 	.set_rate	= ccu_mp_mmc_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_mp_mmc_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_mult.c b/drivers/clk/sunxi-ng/ccu_mult.c
+index 7c8cf2e04e94..a7223bd3e9f9 100644
+--- a/drivers/clk/sunxi-ng/ccu_mult.c
++++ b/drivers/clk/sunxi-ng/ccu_mult.c
+@@ -170,3 +170,4 @@ const struct clk_ops ccu_mult_ops = {
+ 	.recalc_rate	= ccu_mult_recalc_rate,
+ 	.set_rate	= ccu_mult_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_mult_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_mux.c b/drivers/clk/sunxi-ng/ccu_mux.c
+index 7d75da9a1f2e..785803cd7e51 100644
+--- a/drivers/clk/sunxi-ng/ccu_mux.c
++++ b/drivers/clk/sunxi-ng/ccu_mux.c
+@@ -251,6 +251,7 @@ const struct clk_ops ccu_mux_ops = {
+ 	.determine_rate	= __clk_mux_determine_rate,
+ 	.recalc_rate	= ccu_mux_recalc_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_mux_ops);
+ 
+ /*
+  * This clock notifier is called when the frequency of the of the parent
+@@ -285,3 +286,4 @@ int ccu_mux_notifier_register(struct clk *clk, struct ccu_mux_nb *mux_nb)
+ 
+ 	return clk_notifier_register(clk, &mux_nb->clk_nb);
+ }
++EXPORT_SYMBOL_GPL(ccu_mux_notifier_register);
+diff --git a/drivers/clk/sunxi-ng/ccu_nk.c b/drivers/clk/sunxi-ng/ccu_nk.c
+index aee68b00f3b2..b8fa0bf422fb 100644
+--- a/drivers/clk/sunxi-ng/ccu_nk.c
++++ b/drivers/clk/sunxi-ng/ccu_nk.c
+@@ -157,3 +157,4 @@ const struct clk_ops ccu_nk_ops = {
+ 	.round_rate	= ccu_nk_round_rate,
+ 	.set_rate	= ccu_nk_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_nk_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_nkm.c b/drivers/clk/sunxi-ng/ccu_nkm.c
+index b9cfee0276ea..583d3ba5e624 100644
+--- a/drivers/clk/sunxi-ng/ccu_nkm.c
++++ b/drivers/clk/sunxi-ng/ccu_nkm.c
+@@ -206,3 +206,4 @@ const struct clk_ops ccu_nkm_ops = {
+ 	.recalc_rate	= ccu_nkm_recalc_rate,
+ 	.set_rate	= ccu_nkm_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_nkm_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_nkmp.c b/drivers/clk/sunxi-ng/ccu_nkmp.c
+index bda87b38c45c..ec5224ba5b99 100644
+--- a/drivers/clk/sunxi-ng/ccu_nkmp.c
++++ b/drivers/clk/sunxi-ng/ccu_nkmp.c
+@@ -230,3 +230,4 @@ const struct clk_ops ccu_nkmp_ops = {
+ 	.round_rate	= ccu_nkmp_round_rate,
+ 	.set_rate	= ccu_nkmp_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_nkmp_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_nm.c b/drivers/clk/sunxi-ng/ccu_nm.c
+index e6bcc0a7170c..576e464bdf03 100644
+--- a/drivers/clk/sunxi-ng/ccu_nm.c
++++ b/drivers/clk/sunxi-ng/ccu_nm.c
+@@ -238,3 +238,4 @@ const struct clk_ops ccu_nm_ops = {
+ 	.round_rate	= ccu_nm_round_rate,
+ 	.set_rate	= ccu_nm_set_rate,
+ };
++EXPORT_SYMBOL_GPL(ccu_nm_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_phase.c b/drivers/clk/sunxi-ng/ccu_phase.c
+index 92ab8bd66427..ededb36d531c 100644
+--- a/drivers/clk/sunxi-ng/ccu_phase.c
++++ b/drivers/clk/sunxi-ng/ccu_phase.c
+@@ -121,3 +121,4 @@ const struct clk_ops ccu_phase_ops = {
+ 	.get_phase	= ccu_phase_get_phase,
+ 	.set_phase	= ccu_phase_set_phase,
+ };
++EXPORT_SYMBOL_GPL(ccu_phase_ops);
+diff --git a/drivers/clk/sunxi-ng/ccu_reset.c b/drivers/clk/sunxi-ng/ccu_reset.c
+index 483100e45df3..8413de004574 100644
+--- a/drivers/clk/sunxi-ng/ccu_reset.c
++++ b/drivers/clk/sunxi-ng/ccu_reset.c
+@@ -75,3 +75,4 @@ const struct reset_control_ops ccu_reset_ops = {
+ 	.reset		= ccu_reset_reset,
+ 	.status		= ccu_reset_status,
+ };
++EXPORT_SYMBOL_GPL(ccu_reset_ops);
+-- 
+2.32.0
+

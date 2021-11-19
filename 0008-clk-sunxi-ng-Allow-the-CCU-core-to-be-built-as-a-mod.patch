@@ -1,0 +1,175 @@
+From 0b0f8d2f9c3e81918aaada7abbf15119bc347c9d Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 1 Sep 2021 00:05:26 -0500
+Subject: [PATCH 8/8] clk: sunxi-ng: Allow the CCU core to be built as a module
+
+Like the individual CCU drivers, it can be beneficial for memory
+consumption of cross-platform configurations to only load the CCU core
+on the relevant platform. For example, a generic arm64 kernel sees the
+following improvement when building the CCU core and drivers as modules:
+
+  before:
+    text      data     bss     dec       hex      filename
+    13882360  5251670  360800  19494830  12977ae  vmlinux
+
+  after:
+    text      data     bss     dec       hex      filename
+    13734787  5086442  360800  19182029  124b1cd  vmlinux
+
+So the result is a 390KB total reduction in kernel image size.
+
+The one early clock provider (sun5i) requires the core to be built in.
+
+Now that loading the MMC driver will trigger loading the CCU core, the
+MMC timing mode functions do not need a compile-time fallback.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/clk/Makefile              |  2 +-
+ drivers/clk/sunxi-ng/Kconfig      |  3 ++-
+ drivers/clk/sunxi-ng/Makefile     | 33 +++++++++++++++++--------------
+ drivers/clk/sunxi-ng/ccu_common.c |  3 +++
+ drivers/mmc/host/Kconfig          |  1 +
+ include/linux/clk/sunxi-ng.h      | 15 --------------
+ 6 files changed, 25 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
+index e42312121e51..6afe36bd2c0a 100644
+--- a/drivers/clk/Makefile
++++ b/drivers/clk/Makefile
+@@ -110,7 +110,7 @@ obj-$(CONFIG_PLAT_SPEAR)		+= spear/
+ obj-y					+= sprd/
+ obj-$(CONFIG_ARCH_STI)			+= st/
+ obj-$(CONFIG_ARCH_SUNXI)		+= sunxi/
+-obj-$(CONFIG_SUNXI_CCU)			+= sunxi-ng/
++obj-y					+= sunxi-ng/
+ obj-$(CONFIG_ARCH_TEGRA)		+= tegra/
+ obj-y					+= ti/
+ obj-$(CONFIG_CLK_UNIPHIER)		+= uniphier/
+diff --git a/drivers/clk/sunxi-ng/Kconfig b/drivers/clk/sunxi-ng/Kconfig
+index cbae3612a9ef..ee383658ff4d 100644
+--- a/drivers/clk/sunxi-ng/Kconfig
++++ b/drivers/clk/sunxi-ng/Kconfig
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config SUNXI_CCU
+-	bool "Clock support for Allwinner SoCs"
++	tristate "Clock support for Allwinner SoCs"
+ 	depends on ARCH_SUNXI || COMPILE_TEST
+ 	select RESET_CONTROLLER
+ 	default ARCH_SUNXI
+@@ -52,6 +52,7 @@ config SUN5I_CCU
+ 	bool "Support for the Allwinner sun5i family CCM"
+ 	default MACH_SUN5I
+ 	depends on MACH_SUN5I || COMPILE_TEST
++	depends on SUNXI_CCU=y
+ 
+ config SUN6I_A31_CCU
+ 	tristate "Support for the Allwinner A31/A31s CCU"
+diff --git a/drivers/clk/sunxi-ng/Makefile b/drivers/clk/sunxi-ng/Makefile
+index 9ebf5920c93b..6e9eb004fca0 100644
+--- a/drivers/clk/sunxi-ng/Makefile
++++ b/drivers/clk/sunxi-ng/Makefile
+@@ -1,24 +1,27 @@
+ # SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_SUNXI_CCU)		+= sunxi-ccu.o
++
+ # Common objects
+-obj-y				+= ccu_common.o
+-obj-y				+= ccu_mmc_timing.o
+-obj-y				+= ccu_reset.o
++sunxi-ccu-y			+= ccu_common.o
++sunxi-ccu-y			+= ccu_mmc_timing.o
++sunxi-ccu-y			+= ccu_reset.o
+ 
+ # Base clock types
+-obj-y				+= ccu_div.o
+-obj-y				+= ccu_frac.o
+-obj-y				+= ccu_gate.o
+-obj-y				+= ccu_mux.o
+-obj-y				+= ccu_mult.o
+-obj-y				+= ccu_phase.o
+-obj-y				+= ccu_sdm.o
++sunxi-ccu-y			+= ccu_div.o
++sunxi-ccu-y			+= ccu_frac.o
++sunxi-ccu-y			+= ccu_gate.o
++sunxi-ccu-y			+= ccu_mux.o
++sunxi-ccu-y			+= ccu_mult.o
++sunxi-ccu-y			+= ccu_phase.o
++sunxi-ccu-y			+= ccu_sdm.o
+ 
+ # Multi-factor clocks
+-obj-y				+= ccu_nk.o
+-obj-y				+= ccu_nkm.o
+-obj-y				+= ccu_nkmp.o
+-obj-y				+= ccu_nm.o
+-obj-y				+= ccu_mp.o
++sunxi-ccu-y			+= ccu_nk.o
++sunxi-ccu-y			+= ccu_nkm.o
++sunxi-ccu-y			+= ccu_nkmp.o
++sunxi-ccu-y			+= ccu_nm.o
++sunxi-ccu-y			+= ccu_mp.o
+ 
+ # SoC support
+ obj-$(CONFIG_SUNIV_F1C100S_CCU)	+= suniv-f1c100s-ccu.o
+diff --git a/drivers/clk/sunxi-ng/ccu_common.c b/drivers/clk/sunxi-ng/ccu_common.c
+index 3ab109582646..d9619ad32f5c 100644
+--- a/drivers/clk/sunxi-ng/ccu_common.c
++++ b/drivers/clk/sunxi-ng/ccu_common.c
+@@ -9,6 +9,7 @@
+ #include <linux/clk-provider.h>
+ #include <linux/device.h>
+ #include <linux/iopoll.h>
++#include <linux/module.h>
+ #include <linux/slab.h>
+ 
+ #include "ccu_common.h"
+@@ -213,3 +214,5 @@ void of_sunxi_ccu_probe(struct device_node *node, void __iomem *reg,
+ 		kfree(ccu);
+ 	}
+ }
++
++MODULE_LICENSE("GPL");
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index ccc148cdb5ee..cd9f3c626053 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -964,6 +964,7 @@ config MMC_REALTEK_USB
+ config MMC_SUNXI
+ 	tristate "Allwinner sunxi SD/MMC Host Controller support"
+ 	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on SUNXI_CCU
+ 	help
+ 	  This selects support for the SD/MMC Host Controller on
+ 	  Allwinner sunxi SoCs.
+diff --git a/include/linux/clk/sunxi-ng.h b/include/linux/clk/sunxi-ng.h
+index 3cd14acde0a1..cf32123b39f5 100644
+--- a/include/linux/clk/sunxi-ng.h
++++ b/include/linux/clk/sunxi-ng.h
+@@ -6,22 +6,7 @@
+ #ifndef _LINUX_CLK_SUNXI_NG_H_
+ #define _LINUX_CLK_SUNXI_NG_H_
+ 
+-#include <linux/errno.h>
+-
+-#ifdef CONFIG_SUNXI_CCU
+ int sunxi_ccu_set_mmc_timing_mode(struct clk *clk, bool new_mode);
+ int sunxi_ccu_get_mmc_timing_mode(struct clk *clk);
+-#else
+-static inline int sunxi_ccu_set_mmc_timing_mode(struct clk *clk,
+-						bool new_mode)
+-{
+-	return -ENOTSUPP;
+-}
+-
+-static inline int sunxi_ccu_get_mmc_timing_mode(struct clk *clk)
+-{
+-	return -ENOTSUPP;
+-}
+-#endif
+ 
+ #endif
+-- 
+2.32.0
+

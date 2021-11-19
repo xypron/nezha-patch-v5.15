@@ -1,0 +1,124 @@
+From f1e5b5309ae1bfec1ca84466215f64c67f79f55f Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 1 Sep 2021 00:05:20 -0500
+Subject: [PATCH 2/8] clk: sunxi-ng: Prevent unbinding CCUs via sysfs
+
+The CCU drivers are not really designed to be unbound. Unbinding a SoC's
+main CCU is especially pointless, as very few of the peripherals on the
+SoC will work without it. Let's avoid any potential problems by removing
+the bind/unbind attributes from sysfs for these drivers.
+
+This change is not applied to the "secondary" CCUs (DE, USB) as those
+could reasonably be unbound without making the system useless.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ drivers/clk/sunxi-ng/ccu-sun50i-a100-r.c | 1 +
+ drivers/clk/sunxi-ng/ccu-sun50i-a100.c   | 1 +
+ drivers/clk/sunxi-ng/ccu-sun50i-a64.c    | 1 +
+ drivers/clk/sunxi-ng/ccu-sun50i-h6.c     | 1 +
+ drivers/clk/sunxi-ng/ccu-sun8i-a83t.c    | 1 +
+ drivers/clk/sunxi-ng/ccu-sun8i-r40.c     | 1 +
+ drivers/clk/sunxi-ng/ccu-sun9i-a80-de.c  | 1 +
+ drivers/clk/sunxi-ng/ccu-sun9i-a80.c     | 1 +
+ 8 files changed, 8 insertions(+)
+
+diff --git a/drivers/clk/sunxi-ng/ccu-sun50i-a100-r.c b/drivers/clk/sunxi-ng/ccu-sun50i-a100-r.c
+index 6f2a58970556..804729e0a208 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun50i-a100-r.c
++++ b/drivers/clk/sunxi-ng/ccu-sun50i-a100-r.c
+@@ -208,6 +208,7 @@ static struct platform_driver sun50i_a100_r_ccu_driver = {
+ 	.probe	= sun50i_a100_r_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun50i-a100-r-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun50i_a100_r_ccu_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun50i-a100.c b/drivers/clk/sunxi-ng/ccu-sun50i-a100.c
+index 913bb08e6dee..1d475d5a3d91 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun50i-a100.c
++++ b/drivers/clk/sunxi-ng/ccu-sun50i-a100.c
+@@ -1270,6 +1270,7 @@ static struct platform_driver sun50i_a100_ccu_driver = {
+ 	.probe	= sun50i_a100_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun50i-a100-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun50i_a100_ccu_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun50i-a64.c b/drivers/clk/sunxi-ng/ccu-sun50i-a64.c
+index 54f25c624f02..fcbd914e84e0 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun50i-a64.c
++++ b/drivers/clk/sunxi-ng/ccu-sun50i-a64.c
+@@ -978,6 +978,7 @@ static struct platform_driver sun50i_a64_ccu_driver = {
+ 	.probe	= sun50i_a64_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun50i-a64-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun50i_a64_ccu_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun50i-h6.c b/drivers/clk/sunxi-ng/ccu-sun50i-h6.c
+index c0800da2fa3d..9a8902f702c5 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun50i-h6.c
++++ b/drivers/clk/sunxi-ng/ccu-sun50i-h6.c
+@@ -1252,6 +1252,7 @@ static struct platform_driver sun50i_h6_ccu_driver = {
+ 	.probe	= sun50i_h6_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun50i-h6-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun50i_h6_ccu_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun8i-a83t.c b/drivers/clk/sunxi-ng/ccu-sun8i-a83t.c
+index c2ddcd2ddab4..e663ab0c9935 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun8i-a83t.c
++++ b/drivers/clk/sunxi-ng/ccu-sun8i-a83t.c
+@@ -918,6 +918,7 @@ static struct platform_driver sun8i_a83t_ccu_driver = {
+ 	.probe	= sun8i_a83t_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun8i-a83t-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun8i_a83t_ccu_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun8i-r40.c b/drivers/clk/sunxi-ng/ccu-sun8i-r40.c
+index 002e0c3a04db..a2144ee728a0 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun8i-r40.c
++++ b/drivers/clk/sunxi-ng/ccu-sun8i-r40.c
+@@ -1369,6 +1369,7 @@ static struct platform_driver sun8i_r40_ccu_driver = {
+ 	.probe	= sun8i_r40_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun8i-r40-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun8i_r40_ccu_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun9i-a80-de.c b/drivers/clk/sunxi-ng/ccu-sun9i-a80-de.c
+index 261e64416f26..d2072972b614 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun9i-a80-de.c
++++ b/drivers/clk/sunxi-ng/ccu-sun9i-a80-de.c
+@@ -268,6 +268,7 @@ static struct platform_driver sun9i_a80_de_clk_driver = {
+ 	.probe	= sun9i_a80_de_clk_probe,
+ 	.driver	= {
+ 		.name	= "sun9i-a80-de-clks",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun9i_a80_de_clk_ids,
+ 	},
+ };
+diff --git a/drivers/clk/sunxi-ng/ccu-sun9i-a80.c b/drivers/clk/sunxi-ng/ccu-sun9i-a80.c
+index 97aaed0e6850..68b30fdc60fd 100644
+--- a/drivers/clk/sunxi-ng/ccu-sun9i-a80.c
++++ b/drivers/clk/sunxi-ng/ccu-sun9i-a80.c
+@@ -1243,6 +1243,7 @@ static struct platform_driver sun9i_a80_ccu_driver = {
+ 	.probe	= sun9i_a80_ccu_probe,
+ 	.driver	= {
+ 		.name	= "sun9i-a80-ccu",
++		.suppress_bind_attrs = true,
+ 		.of_match_table	= sun9i_a80_ccu_ids,
+ 	},
+ };
+-- 
+2.32.0
+
