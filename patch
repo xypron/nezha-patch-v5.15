@@ -34,6 +34,8 @@ git am $dir/0004-clk-sunxi-ng-Allow-the-CCU-core-to-be-built-as-a-mod.patch
 
 # [PATCH v1 0/6] clk: sunxi-ng: Allwinner D1 clock support
 # https://lore.kernel.org/all/20211119043545.4010-1-samuel@sholland.org/
+# obsoletes
+# https://lore.kernel.org/all/20210928080335.36706-1-samuel@sholland.org/
 git am $dir/0001-dt-bindings-clk-Add-compatibles-for-D1-CCUs.patch
 git am $dir/0002-clk-sunxi-ng-div-Add-macros-using-clk_parent_data-an.patch
 git am $dir/0003-clk-sunxi-ng-mp-Add-macros-using-clk_parent_data-and.patch
@@ -72,16 +74,6 @@ git am $dir/0006-riscv-soc-Add-Allwinner-SoC-kconfig-option.patch
 git am $dir/0001-dt-bindings-watchdog-sunxi-Add-compatibles-for-R329.patch
 git am $dir/0002-dt-bindings-watchdog-sunxi-Add-compatibles-for-D1.patch
 git am $dir/0003-watchdog-sunxi_wdt-Add-support-for-D1.patch
-
-# https://lore.kernel.org/all/20210928080335.36706-1-samuel@sholland.org/
-git am $dir/0001-dt-bindings-rtc-sun6i-Clean-up-repetition.patch
-git am $dir/0002-dt-bindings-rtc-sun6i-Add-H616-R329-and-D1-support.patch
-git am $dir/0003-clk-sunxi-ng-div-Add-macro-using-CLK_HW_INIT_FW_NAME.patch
-git am $dir/0004-clk-sunxi-ng-mux-Add-macro-using-CLK_HW_INIT_PARENTS.patch
-git am $dir/0005-clk-sunxi-ng-mux-Allow-muxes-to-have-keys.patch
-git am $dir/0006-rtc-sun6i-Allow-probing-without-an-early-clock-provi.patch
-git am $dir/0007-clk-sunxi-ng-Add-support-for-the-sun6i-RTC-clocks.patch
-git am $dir/0008-clk-sunxi-ng-sun6i-rtc-Add-support-for-H6.patch
 
 # 0107
 git am $dir/0001-treewide-ARCH_SUNXI-SOC_SUNXI.patch
