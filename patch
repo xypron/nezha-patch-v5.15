@@ -3,7 +3,7 @@
 set -e
 git am --abort 2>/dev/null || true
 
-git reset --hard v5.15.2
+git reset --hard v5.15.3
 
 # https://lore.kernel.org/all/20210609121322.3058-1-anup.patel@wdc.com/
 git am nezha-patch-v5.15/0001-RISC-V-Use-SBI-SRST-extension-when-available.patch
