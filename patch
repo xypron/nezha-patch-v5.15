@@ -69,6 +69,8 @@ git am $dir/0004-RISC-V-Implement-arch_sync_dma-functions.patch
 git am $dir/0005-riscv-errata-Support-T-HEAD-custom-dcache-ops.patch
 git am $dir/0006-riscv-soc-Add-Allwinner-SoC-kconfig-option.patch
 
+# git am $dir/0001-WIP-riscv-Add-Allwinner-D1-SoC-support.patch
+
 # https://lore.kernel.org/all/20210902225750.29313-1-samuel@sholland.org/
 # already merged in next-20211117
 git am $dir/0001-dt-bindings-watchdog-sunxi-Add-compatibles-for-R329.patch
@@ -89,3 +91,15 @@ git am $dir/0005-mmc-sunxi-mmc-Add-more-registers.patch
 git am $dir/0001-Nezha-defconfig.patch
 
 git am $dir/0001-soc-very-early-initialization-of-SUNXI-RISC-V-SOC.patch
+
+exit
+
+# More patches:
+
+# Guo Ren:
+#
+# [PATCH V5 0/3] Add thead,c900-plic support
+# https://lore.kernel.org/all/20211024013303.3499461-1-guoren@kernel.org/
+#
+# [PATCH V6] irqchip/sifive-plic: Fixup EOI failed when masked
+# https://lore.kernel.org/all/20211101131736.3800114-1-guoren@kernel.org/

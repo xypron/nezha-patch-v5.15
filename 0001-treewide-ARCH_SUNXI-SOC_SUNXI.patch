@@ -1,37 +1,37 @@
-From 3f03ace30073d6249ef5bffecc8759fb5f1012b7 Mon Sep 17 00:00:00 2001
+From 1c19f60a40150b5dca39ffb70865909de359b692 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 May 2021 21:17:16 -0500
-Subject: [PATCH 1/1] treewide: ARCH_SUNXI += SOC_SUNXI
+Subject: [PATCH] treewide: ARCH_SUNXI += SOC_SUNXI
 
 Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
- drivers/bus/Kconfig                         | 4 ++--
- drivers/clk/sunxi-ng/Kconfig                | 4 ++--
- drivers/crypto/allwinner/Kconfig            | 5 ++---
- drivers/dma/Kconfig                         | 2 +-
- drivers/gpu/drm/sun4i/Kconfig               | 2 +-
- drivers/hwspinlock/Kconfig                  | 2 +-
- drivers/i2c/busses/Kconfig                  | 2 +-
- drivers/input/keyboard/Kconfig              | 2 +-
- drivers/iommu/Kconfig                       | 3 +--
- drivers/media/platform/Kconfig              | 2 +-
- drivers/media/rc/Kconfig                    | 2 +-
- drivers/mfd/Kconfig                         | 2 +-
- drivers/mmc/host/Kconfig                    | 2 +-
- drivers/net/ethernet/stmicro/stmmac/Kconfig | 4 ++--
- drivers/nvmem/Kconfig                       | 2 +-
- drivers/phy/allwinner/Kconfig               | 4 ++--
- drivers/pwm/Kconfig                         | 2 +-
- drivers/reset/Kconfig                       | 2 +-
- drivers/rtc/Kconfig                         | 2 +-
- drivers/soc/sunxi/Kconfig                   | 2 +-
- drivers/spi/Kconfig                         | 2 +-
- drivers/staging/media/sunxi/Kconfig         | 2 +-
- drivers/thermal/Kconfig                     | 2 +-
- drivers/usb/musb/Kconfig                    | 2 +-
- drivers/watchdog/Kconfig                    | 2 +-
- sound/soc/sunxi/Kconfig                     | 2 +-
- 26 files changed, 31 insertions(+), 33 deletions(-)
+ drivers/bus/Kconfig                         |  4 ++--
+ drivers/clk/sunxi-ng/Kconfig                | 11 ++++++-----
+ drivers/crypto/allwinner/Kconfig            |  5 ++---
+ drivers/dma/Kconfig                         |  2 +-
+ drivers/gpu/drm/sun4i/Kconfig               |  2 +-
+ drivers/hwspinlock/Kconfig                  |  2 +-
+ drivers/i2c/busses/Kconfig                  |  2 +-
+ drivers/input/keyboard/Kconfig              |  2 +-
+ drivers/iommu/Kconfig                       |  3 +--
+ drivers/media/platform/Kconfig              |  2 +-
+ drivers/media/rc/Kconfig                    |  2 +-
+ drivers/mfd/Kconfig                         |  2 +-
+ drivers/mmc/host/Kconfig                    |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig |  4 ++--
+ drivers/nvmem/Kconfig                       |  2 +-
+ drivers/phy/allwinner/Kconfig               |  4 ++--
+ drivers/pwm/Kconfig                         |  2 +-
+ drivers/reset/Kconfig                       |  2 +-
+ drivers/rtc/Kconfig                         |  2 +-
+ drivers/soc/sunxi/Kconfig                   |  2 +-
+ drivers/spi/Kconfig                         |  2 +-
+ drivers/staging/media/sunxi/Kconfig         |  2 +-
+ drivers/thermal/Kconfig                     |  2 +-
+ drivers/usb/musb/Kconfig                    |  2 +-
+ drivers/watchdog/Kconfig                    |  2 +-
+ sound/soc/sunxi/Kconfig                     |  2 +-
+ 26 files changed, 35 insertions(+), 36 deletions(-)
 
 diff --git a/drivers/bus/Kconfig b/drivers/bus/Kconfig
 index a4cf3d692dc3..e03364758d28 100644
@@ -49,21 +49,37 @@ index a4cf3d692dc3..e03364758d28 100644
  	  help
  	  Say y here to enable support for Allwinner A64 DE2 bus driver. It's
 diff --git a/drivers/clk/sunxi-ng/Kconfig b/drivers/clk/sunxi-ng/Kconfig
-index 695e0e407ace..411738a487c3 100644
+index 68a94e5af8ed..e6223752b684 100644
 --- a/drivers/clk/sunxi-ng/Kconfig
 +++ b/drivers/clk/sunxi-ng/Kconfig
-@@ -1,9 +1,9 @@
+@@ -1,7 +1,8 @@
  # SPDX-License-Identifier: GPL-2.0-only
  config SUNXI_CCU
- 	bool "Clock support for Allwinner SoCs"
+ 	tristate "Clock support for Allwinner SoCs"
 -	depends on ARCH_SUNXI || COMPILE_TEST
 +	default ARCH_SUNXI || SOC_SUNXI
 +	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
  	select RESET_CONTROLLER
--	default ARCH_SUNXI
+ 	default ARCH_SUNXI
  
- if SUNXI_CCU
+@@ -14,13 +15,13 @@ config SUNIV_F1C100S_CCU
  
+ config SUN20I_D1_CCU
+ 	tristate "Support for the Allwinner D1 CCU"
+-	default RISCV && ARCH_SUNXI
+-	depends on (RISCV && ARCH_SUNXI) || COMPILE_TEST
++	default RISCV && SOC_SUNXI
++	depends on (RISCV && SOC_SUNXI) || COMPILE_TEST
+ 
+ config SUN20I_D1_R_CCU
+ 	tristate "Support for the Allwinner D1 PRCM CCU"
+-	default RISCV && ARCH_SUNXI
+-	depends on (RISCV && ARCH_SUNXI) || COMPILE_TEST
++	default RISCV && SOC_SUNXI
++	depends on (RISCV && SOC_SUNXI) || COMPILE_TEST
+ 
+ config SUN50I_A64_CCU
+ 	tristate "Support for the Allwinner A64 CCU"
 diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
 index b8e75210a0e3..3d52e77822bd 100644
 --- a/drivers/crypto/allwinner/Kconfig
@@ -203,7 +219,7 @@ index d2f345245538..3329da38c458 100644
  	help
  	  Select this to get support for Allwinner SoCs (A10, A13 and A31) ADC.
 diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index ccc148cdb5ee..4865e4d9e231 100644
+index cd9f3c626053..c1acf1b0a7d2 100644
 --- a/drivers/mmc/host/Kconfig
 +++ b/drivers/mmc/host/Kconfig
 @@ -963,7 +963,7 @@ config MMC_REALTEK_USB
@@ -212,9 +228,9 @@ index ccc148cdb5ee..4865e4d9e231 100644
  	tristate "Allwinner sunxi SD/MMC Host Controller support"
 -	depends on ARCH_SUNXI || COMPILE_TEST
 +	depends on ARCH_SUNXI || SOC_SUNXI || COMPILE_TEST
+ 	depends on SUNXI_CCU
  	help
  	  This selects support for the SD/MMC Host Controller on
- 	  Allwinner sunxi SoCs.
 diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
 index 929cfc22cd0c..a41e570683c8 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
